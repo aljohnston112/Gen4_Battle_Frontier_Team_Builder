@@ -1,3 +1,5 @@
+import random
+import time
 import urllib.request
 from collections import defaultdict
 
@@ -99,6 +101,7 @@ def __scrape_serebii_for_move_sets__():
                         pass
                     else:
                         assert False
+        time.sleep(0.5 + (random.random() / 2.0))
 
 
 if __name__ == "__main__":
