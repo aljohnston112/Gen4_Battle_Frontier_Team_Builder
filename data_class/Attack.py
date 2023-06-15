@@ -11,3 +11,4 @@ class Attack:
     category: Category
     power: int
     accuracy: int
+    effect_percent: int

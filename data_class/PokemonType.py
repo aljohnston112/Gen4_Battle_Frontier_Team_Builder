@@ -33,6 +33,7 @@ __TYPE_DICT__ = {
     "ground": PokemonType.GROUND,
     "rock": PokemonType.ROCK,
     "bug": PokemonType.BUG,
+    "curse": PokemonType.GHOST,
     "ghost": PokemonType.GHOST,
     "steel": PokemonType.STEEL,
     "fire": PokemonType.FIRE,
