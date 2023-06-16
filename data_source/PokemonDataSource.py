@@ -1,14 +1,21 @@
+import json
+import os
 import random
 import time
 import urllib.request
 from collections import defaultdict
+from os.path import exists
+from typing import Dict
 
+import cattr
 from bs4 import BeautifulSoup
 
+from Config import POKEMON_FILE
 from data_class.AllStats import AllStats
 from data_class.Attack import Attack
 from data_class.BaseStats import BaseStats
 from data_class.Category import convert_to_attack_category
+from data_class.Pokemon import Pokemon
 from data_class.PokemonInformation import PokemonInformation
 from data_class.PokemonType import convert_to_pokemon_type
 from data_class.Stat import Stat, StatEnum
@@ -63,6 +70,7 @@ def get_general_information(dextable):
     pounds = float(rows[weight_index].text.strip().split("\n")[2].split("lbs")[0].replace(",", ""))
     return PokemonInformation(
         name=name,
+        pokemon_types=pokemon_types,
         id=national_id,
         ability=ability,
         pounds=pounds
@@ -644,8 +652,8 @@ def get_tm_and_hm_attacks_for_forms(dextable):
 
 
 def __scrape_serebii_for_move_sets__():
-    pokemon_to_moves = defaultdict(lambda: list())
-    last_url_index = 491
+    pokemon_index_to_pokemon = defaultdict(lambda: list())
+    last_url_index = 0
     for pokemon_index in range(last_url_index + 1, num_pokemon + 1):
         url = get_url(pokemon_index)
         with urllib.request.urlopen(url) as fp:
@@ -717,6 +725,23 @@ def __scrape_serebii_for_move_sets__():
                 'Base/Max Pokéthlon Stats - Ghost',
                 'Base/Max Pokéthlon Stats - Dragon',
             ]
+            attack_form_attacks = None
+            trash_form_attacks = None
+            all_rotom_alternative_form_stats = None
+            all_origin_form_stats = None
+            all_sandy_form_stats = None
+            all_sky_form_stats = None
+            all_attack_form_stats = None
+            pre_evolution_index_to_level_to_moves = None
+            form_to_tm_or_hm_to_attack = None
+            move_tutor_attacks = None
+            egg_moves = None
+            game_to_level_to_moves = None
+            special_moves = None
+            sky_form_attacks = None
+            form_to_all_stats = None
+            form_to_attacks = None
+            form_to_move_tutor_attacks = None
             for dextable in center_dextables:
                 first_row_text = dextable.find("tr").text
                 if first_row_text not in first_row_text_that_marks_skippable_table:
@@ -785,11 +810,6 @@ def __scrape_serebii_for_move_sets__():
                             dextable,
                             pokemon_information.name
                         )
-                    elif first_row_text == '\nStats - Origin Forme':
-                        all_origin_form_stats = get_stats(
-                            dextable,
-                            pokemon_information.name
-                        )
                     elif first_row_text == '\nStats - Sky Forme':
                         all_sky_form_stats = get_stats(
                             dextable,
@@ -818,20 +838,66 @@ def __scrape_serebii_for_move_sets__():
                 form_to_attacks["Attack Forme"] = attack_form_attacks
                 form_to_attacks["Defense Forme"] = defense_form_attacks
                 form_to_attacks["Speed Forme"] = speed_form_attacks
-                attack_form_attacks = None
-                defense_form_attacks = None
-                speed_form_attacks = None
             if trash_form_attacks is not None:
                 form_to_attacks = dict()
                 form_to_attacks["Sandy Cloak"] = sandy_form_attacks
                 form_to_attacks["Trash Cloak"] = trash_form_attacks
-                sandy_form_attacks = None
-                trash_form_attacks = None
             if sky_form_attacks is not None:
                 form_to_attacks = {"Sky Forme": sky_form_attacks}
-                                
+            if all_attack_form_stats is not None:
+                form_to_all_stats = dict()
+                form_to_all_stats["Attack Forme"] = all_attack_form_stats
+                form_to_all_stats["Defense Forme"] = all_defense_form_stats
+                form_to_all_stats["Speed Forme"] = all_speed_form_stats
+            if all_sandy_form_stats is not None:
+                form_to_all_stats = dict()
+                form_to_all_stats["Sandy Cloak"] = all_sandy_form_stats
+                form_to_all_stats["Trash Cloak"] = all_trash_form_stats
+            if all_rotom_alternative_form_stats is not None:
+                form_to_all_stats = dict()
+                form_to_all_stats["Alternate Forms"] = all_rotom_alternative_form_stats
+            if all_origin_form_stats is not None:
+                form_to_all_stats = dict()
+                form_to_all_stats["Origin Forme"] = all_origin_form_stats
+            if all_sky_form_stats is not None:
+                form_to_all_stats = dict()
+                form_to_all_stats["Sky Forme"] = all_sky_form_stats
+
+            assert pokemon_information is not None
+            assert all_stats is not None
+            assert level_to_attacks is not None
+            assert tm_or_hm_to_attack is not None
+            pokemon = Pokemon(
+                pokemon_information=pokemon_information,
+                all_stats=all_stats,
+                form_to_all_stats=form_to_all_stats,
+                pre_evolution_index_to_level_to_moves=pre_evolution_index_to_level_to_moves,
+                level_to_attacks=level_to_attacks,
+                form_to_level_up_attacks=form_to_attacks,
+                tm_or_hm_to_attack=tm_or_hm_to_attack,
+                form_to_tm_or_hm_to_attack=form_to_tm_or_hm_to_attack,
+                move_tutor_attacks=move_tutor_attacks,
+                form_to_move_tutor_attacks=form_to_move_tutor_attacks,
+                egg_moves=egg_moves,
+                game_to_level_to_moves=game_to_level_to_moves,
+                special_moves=special_moves,
+            )
+            pokemon_index_to_pokemon[pokemon_index] = pokemon
         time.sleep(0.5 + (random.random() / 2.0))
+    return pokemon_index_to_pokemon
+
+
+def get_pokemon() -> Dict[int, Pokemon]:
+    if not exists(POKEMON_FILE):
+        pokemon_index_to_pokemon = __scrape_serebii_for_move_sets__()
+        with open(POKEMON_FILE, "w") as fo:
+            fo.write(json.dumps(cattr.unstructure(pokemon_index_to_pokemon)))
+    else:
+        with open(POKEMON_FILE, "r") as fo:
+            pokemon_index_to_pokemon = cattr.structure(json.loads(fo.read()), Dict[str, Pokemon])
+    return pokemon_index_to_pokemon
 
 
 if __name__ == "__main__":
-    __scrape_serebii_for_move_sets__()
+    pokemon_index_to_pokemon = get_pokemon()
+    pass
