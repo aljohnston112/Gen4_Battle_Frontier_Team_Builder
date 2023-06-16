@@ -800,9 +800,9 @@ def __scrape_serebii_for_move_sets__():
                     elif first_row_text == "Special Moves":
                         special_moves = get_attacks(dextable)
                     elif first_row_text == 'Diamond/Pearl Level Up (Attack Form)':
-                        attack_form_moves = get_level_up_attacks(dextable)
+                        attack_form_attacks = get_level_up_attacks(dextable)
                     elif first_row_text == "Diamond/Pearl Level Up (Defense Form)":
-                        defense_form_moves = get_level_up_attacks(dextable)
+                        defense_form_attacks = get_level_up_attacks(dextable)
                     elif first_row_text == "Diamond/Pearl Level Up (Speed Form)":
                         speed_form_attacks = get_level_up_attacks(dextable)
                     elif first_row_text == "Diamond/Pearl Level Up (Sandy Cloak)":
@@ -813,6 +813,23 @@ def __scrape_serebii_for_move_sets__():
                         sky_form_attacks = get_level_up_attacks(dextable)
                     else:
                         assert False
+            if attack_form_attacks is not None:
+                form_to_attacks = dict()
+                form_to_attacks["Attack Forme"] = attack_form_attacks
+                form_to_attacks["Defense Forme"] = defense_form_attacks
+                form_to_attacks["Speed Forme"] = speed_form_attacks
+                attack_form_attacks = None
+                defense_form_attacks = None
+                speed_form_attacks = None
+            if trash_form_attacks is not None:
+                form_to_attacks = dict()
+                form_to_attacks["Sandy Cloak"] = sandy_form_attacks
+                form_to_attacks["Trash Cloak"] = trash_form_attacks
+                sandy_form_attacks = None
+                trash_form_attacks = None
+            if sky_form_attacks is not None:
+                form_to_attacks = {"Sky Forme": sky_form_attacks}
+                                
         time.sleep(0.5 + (random.random() / 2.0))
 
 
