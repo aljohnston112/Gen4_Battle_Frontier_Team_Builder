@@ -33,23 +33,34 @@ def get_general_information(dextable):
     for type_image_link in type_image_links:
         type_name = type_image_link['href'].strip().split('/')[2].split('.')[0]
         pokemon_types.append(convert_to_pokemon_type(type_name))
-
-    ability_index = 6
-    weight_index = 9
-    if rows[6].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
-        ability_index -= 2
-        weight_index -= 2
+    if rows[5].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
+        ability_index = 3
+        weight_index = 6
+    elif rows[6].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
+        ability_index = 4
+        weight_index = 7
     elif rows[7].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
-        ability_index -= 1
-        weight_index -= 1
+        ability_index = 6
+        weight_index = 9
+    elif rows[8].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
+        ability_index = 7
+        weight_index = 10
     elif rows[9].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
-        ability_index += 1
-        weight_index += 1
+        ability_index = 7
+        weight_index = 10
     else:
-        assert rows[8].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n"
-    assert "Ability" in rows[ability_index].text
+        assert rows[11].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n"
+        ability_index = 9
+        weight_index = 12
+    if "Ability" not in rows[ability_index].text:
+        ability_index -= 1
+        assert "Ability" in rows[ability_index].text
+
     ability = rows[ability_index].text.strip().split(":")[1].strip()
-    pounds = float(rows[weight_index].text.strip().split("\n")[2].split("lbs")[0])
+    if "lbs" not in rows[weight_index].text:
+        weight_index -= 1
+        assert "Ability" in rows[ability_index].text
+    pounds = float(rows[weight_index].text.strip().split("\n")[2].split("lbs")[0].replace(",", ""))
     return PokemonInformation(
         name=name,
         id=national_id,
@@ -63,7 +74,14 @@ def get_level_up_attacks(dextable):
     rows = [row for row in dextable.find_all("tr")]
     assert rows[0].text == "Diamond/Pearl/Platinum/HeartGold/SoulSilver Level Up" or \
            rows[0].text == 'Platinum/HeartGold/SoulSilver Level Up' or \
-           rows[0].text == 'Diamond/Pearl/Platinum Level Up'
+           rows[0].text == 'Diamond/Pearl/Platinum Level Up' or \
+           rows[0].text == 'Diamond/Pearl Level Up (Attack Form)' or \
+           rows[0].text == "Diamond/Pearl Level Up (Defense Form)" or \
+           rows[0].text == "Diamond/Pearl Level Up (Speed Form)" or \
+           rows[0].text == "Diamond/Pearl Level Up (Sandy Cloak)" or \
+           rows[0].text == "Diamond/Pearl Level Up (Trash Cloak)" or \
+           rows[0].text == 'Diamond/Pearl/Platinum/HeartGold/SoulSilver Level Up (All  Forms)' or \
+           rows[0].text == 'Sky Forme Level Up'
     assert rows[1].text == 'LevelAttack NameTypeCat.Att.Acc.PPEffect %'
     current_index = 2
     while current_index < len(rows):
@@ -87,7 +105,8 @@ def get_level_up_attacks(dextable):
                 name == "Sonicboom" or \
                 name == "Mirror Coat" or \
                 name == "Counter" or \
-                name == "Bide":
+                name == "Bide" or \
+                name == "Metal Burst":
             power = 0
         elif name == "Gyro Ball" or name == "Magnitude":
             power = 150
@@ -109,7 +128,7 @@ def get_level_up_attacks(dextable):
             power = 200
         elif name == "Fling":
             power = 130
-        elif name == "Wring Out":
+        elif name == "Wring Out" or name == "Frustration" or name == "Return":
             power = 102
         elif name == "Spit Up":
             power = 300
@@ -117,6 +136,8 @@ def get_level_up_attacks(dextable):
             power = 70
         elif name == "Psywave":
             power = 150
+        elif name == "Crush Grip":
+            power = 121
         power = int(power)
         accuracy = columns[5].text
         if accuracy == "--":
@@ -242,6 +263,8 @@ def get_attacks(dextable):
             power = 102
         elif name == "Night Shade" or name == "Seismic Toss":
             power = 100
+        elif name == "Low Kick":
+            power = 120
         power = int(power)
 
         accuracy = columns[4].text
@@ -326,9 +349,74 @@ def get_third_gen_moves(dextable):
     return game_to_level_to_attacks
 
 
+def get_forms_move_tutor_attacks(dextable):
+    form_to_attacks = defaultdict(lambda: list())
+    rows = [row for row in dextable.find_all("tr")]
+    assert rows[0].text == "Platinum/HeartGold/SoulSilver Move Tutor Attacks"
+    assert rows[1].text.strip() == 'Attack NameTypeCat.Att.Acc.PPEffect %Form'
+    current_index = 2
+    while current_index < len(rows):
+        columns = rows[current_index].find_all("td")
+        name = columns[0].text.strip()
+        type_images = columns[1].find_all("img")
+        assert len(type_images) == 1
+        pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        category_images = columns[2].find_all("img")
+        assert len(category_images) == 1
+        category = category_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        power = columns[3].text
+        if power == "--" or name == "Endeavor":
+            power = 0
+        if name == "Hidden Power":
+            power = 70
+        elif name == "Frustration" or name == "Return":
+            power = 102
+        elif name == "Natural Gift":
+            power = 80
+        elif name == "Grass Knot":
+            power = 120
+        power = int(power)
+        accuracy = columns[4].text
+        if accuracy == "--":
+            accuracy = 100
+        accuracy = int(accuracy)
+        effect_chance = columns[6].text
+        if effect_chance == "--":
+            effect_chance = 0
+        effect_chance = int(effect_chance)
+        if name == "" and pokemon_type == "" and power == 0 and accuracy == 100 and effect_chance == 0:
+            current_index += 1
+        else:
+            attack = (
+                Attack(
+                    name=name,
+                    pokemon_type=convert_to_pokemon_type(pokemon_type),
+                    category=convert_to_attack_category(category),
+                    power=power,
+                    accuracy=accuracy,
+                    effect_percent=effect_chance
+                )
+            )
+            current_index += 1
+            columns = rows[current_index].find_all("td")
+            for column in columns:
+                form = column.find("img")["title"]
+                form_to_attacks[form].append(attack)
+        current_index += 2
+    return form_to_attacks
+
+
 def get_stats(dextable, name):
     rows = [row for row in dextable.find_all("tr")]
-    assert rows[0].text == "\nStats"
+    assert rows[0].text == "\nStats" or \
+           rows[0].text == "\nStats - Attack Forme" or \
+           rows[0].text == "\nStats - Defense Forme" or \
+           rows[0].text == "\nStats - Speed Forme" or \
+           rows[0].text == "\nStats - Sandy Cloak" or \
+           rows[0].text == "\nStats - Trash Cloak" or \
+           rows[0].text == '\nStats - Alternate Forms' or \
+           rows[0].text == '\nStats - Origin Forme' or \
+           rows[0].text == '\nStats - Sky Forme'
     assert rows[1].text.strip() == 'HP\nAttack\nDefense\nSp. Attack\nSp. Defense\nSpeed'
     base_stat_tokens = rows[2].text.split("\n")
     assert len(base_stat_tokens) == 7
@@ -447,22 +535,20 @@ def get_pre_evolution_moves(dextable):
             assert len(category_images) == 1
             category = category_images[0]['src'].split("/")[-1].split(".")[0].strip()
             power = columns[3].text
-            if power == "--" or name == "Endeavor" or name == "Bide":
+            if power == "--" or name == "Endeavor" or name == "Bide" or name == 'Night Shade':
                 power = 0
             if name == "Hidden Power":
                 power = 70
-            elif name == "Frustration" or name == "Return":
+            elif name == "Frustration" or name == "Return" or name == "Wring Out":
                 power = 102
             elif name == "Natural Gift":
                 power = 80
             elif name == "Grass Knot":
                 power = 120
-            elif name == "Horn Drill":
+            elif name == "Horn Drill" or name == "Fissure":
                 power = -1
             elif name == "Reversal" or name == "Flail" or name == "Trump Card":
                 power = 200
-            elif name == "Wring Out":
-                power = 102
             power = int(power)
             accuracy = columns[4].text
             if accuracy == "--":
@@ -497,9 +583,69 @@ def get_pre_evolution_moves(dextable):
     return pre_evolution_index_to_level_to_moves
 
 
+def get_tm_and_hm_attacks_for_forms(dextable):
+    form_to_tm_or_hm_to_attacks = defaultdict(lambda: dict())
+    rows = [row for row in dextable.find_all("tr")]
+    assert rows[0].text == "TM & HM Attacks"
+    assert rows[1].text == 'TM/HM #Attack NameTypeCat.Att.Acc.PPEffect %Form'
+    current_index = 2
+    while current_index < len(rows):
+        columns = rows[current_index].find_all("td")
+        tm_or_hm = columns[0].text.strip()
+        name = columns[1].text.strip()
+        type_images = columns[2].find_all("img")
+        assert len(type_images) == 1
+        pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        category_images = columns[3].find_all("img")
+        assert len(category_images) == 1
+        category = category_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        power = columns[4].text
+        if power == "--":
+            power = 0
+        if name == "Hidden Power":
+            power = 70
+        elif name == "Frustration" or name == "Return":
+            power = 102
+        elif name == "Natural Gift":
+            power = 80
+        elif name == "Grass Knot":
+            power = 120
+        elif name == "Gyro Ball":
+            power = 150
+        power = int(power)
+        accuracy = columns[5].text
+        if accuracy == "--":
+            accuracy = 100
+        accuracy = int(accuracy)
+        effect_chance = columns[6].text
+        if effect_chance == "--":
+            effect_chance = 0
+        effect_chance = int(effect_chance)
+        if name == "" and pokemon_type == "" and power == 0 and accuracy == 100 and effect_chance == 0:
+            current_index += 1
+        else:
+            attack = (
+                Attack(
+                    name=name,
+                    pokemon_type=convert_to_pokemon_type(pokemon_type),
+                    category=convert_to_attack_category(category),
+                    power=power,
+                    accuracy=accuracy,
+                    effect_percent=effect_chance
+                )
+            )
+            current_index += 1
+            columns = rows[current_index].find_all("td")
+            for column in columns:
+                form = column.find("img")["title"]
+                form_to_tm_or_hm_to_attacks[form][tm_or_hm] = attack
+        current_index += 2
+    return form_to_tm_or_hm_to_attacks
+
+
 def __scrape_serebii_for_move_sets__():
     pokemon_to_moves = defaultdict(lambda: list())
-    last_url_index = 278
+    last_url_index = 491
     for pokemon_index in range(last_url_index + 1, num_pokemon + 1):
         url = get_url(pokemon_index)
         with urllib.request.urlopen(url) as fp:
@@ -548,20 +694,51 @@ def __scrape_serebii_for_move_sets__():
                 '\nAlternate Forms\n',
                 'Base/Max Pokéthlon Stats',
                 'Base/Max Pokéthlon Stats - (A-Z)',
+                'Base/Max Pokéthlon Stats - Normal Forme',
+                'Base/Max Pokéthlon Stats - Attack Forme',
+                'Base/Max Pokéthlon Stats - Defense Forme',
+                'Base/Max Pokéthlon Stats - Speed Forme',
+                'HGSS TM & HM Attacks',
+                'Base/Max Pokéthlon Stats - Plant Cloak',
+                'Base/Max Pokéthlon Stats - Sandy Cloak',
+                'Base/Max Pokéthlon Stats - Trash Cloak',
+                'HeartGold/SoulSilver Level Up (Altered Forme & Origin Forme)',
+                'Base/Max Pokéthlon Stats - Altered Forme',
+                'Base/Max Pokéthlon Stats - Origin Forme',
+                'Base/Max Pokéthlon Stats - Land Forme',
+                'Base/Max Pokéthlon Stats - Sky Forme',
+                'Base/Max Pokéthlon Stats - Normal, Fire, Ground, Rock',
+                'Base/Max Pokéthlon Stats - Water, Electric, Psychic',
+                'Base/Max Pokéthlon Stats - Poison, Steel',
+                'Base/Max Pokéthlon Stats - Fighting, Dark',
+                'Base/Max Pokéthlon Stats - Flying, Bug',
+                'Base/Max Pokéthlon Stats - Grass',
+                'Base/Max Pokéthlon Stats - Ice',
+                'Base/Max Pokéthlon Stats - Ghost',
+                'Base/Max Pokéthlon Stats - Dragon',
             ]
             for dextable in center_dextables:
                 first_row_text = dextable.find("tr").text
                 if first_row_text not in first_row_text_that_marks_skippable_table:
                     if first_row_text == "\nName\nJp. Name\nNo.\nGender Ratio\nType\n":
                         pokemon_information = get_general_information(dextable)
+                    elif first_row_text == "Platinum/HeartGold/SoulSilver Move Tutor Attacks" and \
+                            (pokemon_index == 386 or
+                             pokemon_index == 413 or
+                             pokemon_index == 487 or
+                             pokemon_index == 492):
+                        form_to_move_tutor_attacks = get_forms_move_tutor_attacks(dextable)
+                    elif first_row_text == "TM & HM Attacks" and pokemon_index == 413:
+                        form_to_tm_or_hm_to_attack = get_tm_and_hm_attacks_for_forms(dextable)
                     elif first_row_text == "Diamond/Pearl/Platinum/HeartGold/SoulSilver Level Up" or \
                             first_row_text == 'Platinum/HeartGold/SoulSilver Level Up' or \
-                            first_row_text == 'Diamond/Pearl/Platinum Level Up':
+                            first_row_text == 'Diamond/Pearl/Platinum Level Up' or \
+                            first_row_text == 'Diamond/Pearl/Platinum/HeartGold/SoulSilver Level Up (All  Forms)':
                         level_to_attacks = get_level_up_attacks(dextable)
                     elif first_row_text == "TM & HM Attacks":
                         tm_or_hm_to_attack = get_tm_and_hm_attacks(dextable)
                     elif first_row_text == "Platinum/HeartGold/SoulSilver Move Tutor Attacks":
-                        gen_4_move_tutor_attacks = get_attacks(dextable)
+                        move_tutor_attacks = get_attacks(dextable)
                     elif first_row_text == 'Move Tutor Attacks':
                         move_tutor_attacks = get_attacks(dextable)
                     elif first_row_text == "Egg Moves (Details)":
@@ -573,10 +750,67 @@ def __scrape_serebii_for_move_sets__():
                             dextable,
                             pokemon_information.name
                         )
+                    elif first_row_text == "\nStats - Attack Forme":
+                        all_attack_form_stats = get_stats(
+                            dextable,
+                            pokemon_information.name
+                        )
+                    elif first_row_text == "\nStats - Defense Forme":
+                        all_defense_form_stats = get_stats(
+                            dextable,
+                            pokemon_information.name
+                        )
+                    elif first_row_text == "\nStats - Speed Forme":
+                        all_speed_form_stats = get_stats(
+                            dextable,
+                            pokemon_information.name
+                        )
+                    elif first_row_text == "\nStats - Sandy Cloak":
+                        all_sandy_form_stats = get_stats(
+                            dextable,
+                            pokemon_information.name
+                        )
+                    elif first_row_text == "\nStats - Trash Cloak":
+                        all_trash_form_stats = get_stats(
+                            dextable,
+                            pokemon_information.name
+                        )
+                    elif first_row_text == '\nStats - Alternate Forms':
+                        all_rotom_alternative_form_stats = get_stats(
+                            dextable,
+                            pokemon_information.name
+                        )
+                    elif first_row_text == '\nStats - Origin Forme':
+                        all_origin_form_stats = get_stats(
+                            dextable,
+                            pokemon_information.name
+                        )
+                    elif first_row_text == '\nStats - Origin Forme':
+                        all_origin_form_stats = get_stats(
+                            dextable,
+                            pokemon_information.name
+                        )
+                    elif first_row_text == '\nStats - Sky Forme':
+                        all_sky_form_stats = get_stats(
+                            dextable,
+                            pokemon_information.name
+                        )
                     elif first_row_text == 'Pre-Evolution Moves':
                         pre_evolution_index_to_level_to_moves = get_pre_evolution_moves(dextable)
                     elif first_row_text == "Special Moves":
                         special_moves = get_attacks(dextable)
+                    elif first_row_text == 'Diamond/Pearl Level Up (Attack Form)':
+                        attack_form_moves = get_level_up_attacks(dextable)
+                    elif first_row_text == "Diamond/Pearl Level Up (Defense Form)":
+                        defense_form_moves = get_level_up_attacks(dextable)
+                    elif first_row_text == "Diamond/Pearl Level Up (Speed Form)":
+                        speed_form_attacks = get_level_up_attacks(dextable)
+                    elif first_row_text == "Diamond/Pearl Level Up (Sandy Cloak)":
+                        sandy_form_attacks = get_level_up_attacks(dextable)
+                    elif first_row_text == "Diamond/Pearl Level Up (Trash Cloak)":
+                        trash_form_attacks = get_level_up_attacks(dextable)
+                    elif first_row_text == 'Sky Forme Level Up':
+                        sky_form_attacks = get_level_up_attacks(dextable)
                     else:
                         assert False
         time.sleep(0.5 + (random.random() / 2.0))
