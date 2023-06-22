@@ -732,16 +732,20 @@ def __scrape_serebii_for_move_sets__():
             all_sandy_form_stats = None
             all_sky_form_stats = None
             all_attack_form_stats = None
+            sky_form_attacks = None
+            form_to_attacks = None
+            pokemon_information = None
+            all_stats = None
+            form_to_all_stats = None
             pre_evolution_index_to_level_to_moves = None
+            level_to_attacks = None
+            tm_or_hm_to_attack = None
             form_to_tm_or_hm_to_attack = None
             move_tutor_attacks = None
+            form_to_move_tutor_attacks = None
             egg_moves = None
             game_to_level_to_moves = None
             special_moves = None
-            sky_form_attacks = None
-            form_to_all_stats = None
-            form_to_attacks = None
-            form_to_move_tutor_attacks = None
             for dextable in center_dextables:
                 first_row_text = dextable.find("tr").text
                 if first_row_text not in first_row_text_that_marks_skippable_table:
@@ -866,7 +870,6 @@ def __scrape_serebii_for_move_sets__():
             assert pokemon_information is not None
             assert all_stats is not None
             assert level_to_attacks is not None
-            assert tm_or_hm_to_attack is not None
             pokemon = Pokemon(
                 pokemon_information=pokemon_information,
                 all_stats=all_stats,
