@@ -17,7 +17,6 @@ pokemon_name_to_index = get_pokemon_name_to_index()
 pokemon_index_to_pokemon = get_pokemon()
 frontier_pokemon = get_battle_frontier_pokemon()
 
-frontier_set_to_pokemon_to_move_damage = defaultdict()
 
 
 def get_attack_multiplier(nature: str):
@@ -155,8 +154,8 @@ def get_set_to_damage_tables(level):
 
             defense = get_defense_for_frontier_pokemon(level, int(set_number), pokemon)
             special_defense = get_special_defense_for_frontier_pokemon(level, int(set_number), pokemon)
-            min_defense = 5
-            max_defense = 230
+            min_defense = 9
+            max_defense = 614
             for move in pokemon['moves']:
                 move_type = move['move_type']
                 power = move['power']

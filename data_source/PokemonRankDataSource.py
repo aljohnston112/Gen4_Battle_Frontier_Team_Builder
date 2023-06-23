@@ -1,3 +1,4 @@
+import copy
 import json
 from collections import defaultdict
 from os.path import exists
@@ -23,14 +24,15 @@ def get_defense_multipliers_for_type(
     safe_to_cache = False
     cached = False
     if current_defense_multipliers is None:
-        safe_to_cache = True
         current_defense_multipliers = defense_multiplier_cache.get(pokemon_type, None)
         if current_defense_multipliers is None:
+            safe_to_cache = True
             current_defense_multipliers = defaultdict(lambda: 1.0)
         else:
             cached = True
 
     if not cached:
+        current_defense_multipliers = copy.deepcopy(current_defense_multipliers)
         # [no_eff, not_eff, normal_eff, super_eff]
         no_effect_types = defender_type_chart[0].get(pokemon_type, [])
         not_effective_types = defender_type_chart[1].get(pokemon_type, [])
@@ -82,30 +84,41 @@ def get_pokemon_to_category_to_type_to_damage_table():
     return pokemon_to_category_to_type_to_damage_table
 
 
+# TODO non-deterministic
 def rank_pokemon(pokemon_to_category_to_type_to_damage_table):
     set_to_pokemon_to_move_to_rank = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: 0)))
+
     for pokemon, pokemon_category_to_type_to_damage_table in pokemon_to_category_to_type_to_damage_table.items():
+
         pokemon_hp = pokemon_to_damage_tables[pokemon][0].hp
         pokemon_defense = pokemon_to_damage_tables[pokemon][0].defense
         pokemon_special_defense = pokemon_to_damage_tables[pokemon][0].special_defense
         pokemon_speed = pokemon_to_damage_tables[pokemon][0].speed
+
         pokemon_defense_multipliers = get_defense_multipliers_for_types(
             frozenset([t.name.lower() for t in pokemon_to_damage_tables[pokemon][0].pokemon_types])
         )
+
         for set_number, frontier_damage_tables in set_to_damage_tables.items():
             for opponent_damage_tables in frontier_damage_tables:
+
                 opponent_hp = opponent_damage_tables.hp
                 opponent_defense = opponent_damage_tables.defense
                 opponent_special_defense = opponent_damage_tables.special_defense
                 opponent_speed = opponent_damage_tables.speed
+
                 opponent_defense_multipliers = get_defense_multipliers_for_types(
                     frozenset([t.name.lower() for t in opponent_damage_tables.pokemon_types])
                 )
+
                 max_damage_opponent_can_do = 0
                 for opponent_attack_damage_table in opponent_damage_tables.attack_damage_tables:
+
                     category = opponent_attack_damage_table.category
                     move_type = opponent_attack_damage_table.move_type
+
                     attack_multiplier = pokemon_defense_multipliers[move_type]
+
                     if category == 'special':
                         max_damage_opponent_can_do = max(
                             max_damage_opponent_can_do,
@@ -121,8 +134,10 @@ def rank_pokemon(pokemon_to_category_to_type_to_damage_table):
 
                 for pokemon_attack_category, pokemon_attack_type_to_name_and_damage_table \
                         in pokemon_category_to_type_to_damage_table.items():
+
                     for pokemon_attack_type, pokemon_attack_name_and_damage_table \
                             in pokemon_attack_type_to_name_and_damage_table.items():
+
                         opponent_defense_multiplier = \
                             opponent_defense_multipliers[pokemon_attack_type.lower()]
                         move_name = pokemon_attack_name_and_damage_table[0]
