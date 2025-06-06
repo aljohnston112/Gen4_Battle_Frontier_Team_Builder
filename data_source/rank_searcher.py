@@ -1,7 +1,15 @@
+import math
 from collections import defaultdict
 
+from data_class.Pokemon import Pokemon
 from data_source.PokemonDataSource import get_pokemon
 from data_source.PokemonRankDataSource import get_defense_multipliers_for_types
+
+
+def calc_stat(base, iv, ev, level, nature=1.0):
+    stat = ((2 * base + iv + (ev // 4)) * level) // 100 + 5
+    return int(stat * nature)
+
 
 def intersect_attack_results(
         *results_lists: list[tuple[str, float, str]]
@@ -29,6 +37,14 @@ def intersect_attack_results(
 
     return intersection
 
+
+def calculate_gen4_min_damage(level, power, atk, defense, stab, effectiveness):
+    step1 = math.floor((2 * level) / 5) + 2
+    step2 = math.floor(step1 * power * atk / defense)
+    step3 = math.floor(step2 / 50) + 2
+    damage = math.floor(math.floor(math.floor(step3 * 0.85) * stab) * effectiveness)
+    return damage
+
 def find_best_attack_against_target(
         all_pokemon: dict,
         o_stats: dict
@@ -52,11 +68,16 @@ def find_best_attack_against_target(
         best_move = None
 
         for move in get_all_attacks(pokemon, 50):
-            bad_moves = {"gyro ball", "rock slide", "stone edge", "outrage", "iron tail", "focus blast", "dream eater", "spit up", "frustration", "thunder", "hydro pump", "blizzard", "explosion", "self-destruct", "flail", "reversal", "solarbeam", "hyper beam", "giga impact", "last resort", "focus punch", "fling", "grass knot"}
+            bad_moves = {
+                "Selfdestruct", "gyro ball", "rock slide", "stone edge", "outrage", "iron tail", "focus blast",
+                "dream eater", "spit up", "frustration", "thunder", "hydro pump", "blizzard", "explosion",
+                "self-destruct", "flail", "reversal", "solarbeam", "hyper beam", "giga impact", "last resort",
+                "focus punch", "fling", "grass knot"
+            }
             if move.name.lower() in bad_moves or move.accuracy != 100:
                 continue
 
-            if not move.power:
+            if move.power == 0:
                 continue
 
             move_type = move.pokemon_type.name.lower()
@@ -65,8 +86,9 @@ def find_best_attack_against_target(
             is_special = move.category.name.lower() == "special"
             attack_stat = special_attack if is_special else attack
             defense_stat = o_special_defense if is_special else o_defense
+            stab = 1.5 if move_type in [t.name.lower() for t in pokemon.pokemon_information.pokemon_types] else 1.0
 
-            damage = ((((22 * power * (attack_stat / defense_stat)) / 50) + 2) * multiplier)
+            damage = calculate_gen4_min_damage(50, power, attack_stat, defense_stat, stab, multiplier)
             hits = o_hp / damage if damage > 0 else inf
 
             if hits < best_hits:
@@ -153,10 +175,11 @@ def intersect_survivability(*results_lists):
     output.sort(key=lambda x: min(x[1]), reverse=True)
     return output
 
+
 def calculate_survivability(
-    pokemon_map,
-    attacker_stats: dict,
-    moves: list[tuple[int, str, bool]]  # (power, type, is_special)
+        pokemon_map,
+        attacker_stats: dict,
+        moves: list[tuple[int, str, bool]]  # (power, type, is_special)
 ):
     results = []
 
@@ -205,17 +228,19 @@ BANNED_NAMES = {
     "Darkrai", "Shaymin", "Arceus"
 }
 
+
 def filter_banned_pokemon(pokemon_map):
     return {
         idx: p for idx, p in pokemon_map.items()
         if p.pokemon_information.name not in BANNED_NAMES
     }
 
+
 def main():
     pokemon_map = get_pokemon()
     pokemon_map = filter_banned_pokemon(pokemon_map)
 
-    # milotic
+    # Milotic
     attacker_stats = {
         "hp": 202,
         "attack": 99,
@@ -229,18 +254,27 @@ def main():
         (95, "water", True),  # Surf
         (95, "ice", True),  # Ice Beam
     ]
-    # results1 = calculate_survivability(pokemon_map, attacker_stats, moves)
-    # for name, hits in results1:
-    #     print(f"{name:<20} | Hits survived: {hits:.2f}")
 
-    results1 = find_best_attack_against_target(
-            pokemon_map,
-            attacker_stats
+    survive_results1 = calculate_survivability(pokemon_map, attacker_stats, moves)
+    # for name, hits in survive_results1:
+    #     print(f"{name} | Hits survived: {hits:.2f}")
+
+    attack_results1 = find_best_attack_against_target(
+        pokemon_map,
+        attacker_stats
     )
-    for name, hits, move in results1:
-        print(f"{name:<20} | Hits survived: {hits:<10.2f} | Move: {move}")
+    # for name, hits, move in attack_results1:
+    #     print(f"{name} | Hits survived: {hits:.2f} | Move: {move}")
 
-    # rhypherior
+    # results = find_min_ev_for_hits(pokemon_map, attacker_stats)
+    # print(f"{'Pokemon':<15} {'Hits':<8} {'EV':} {'Nature':} {'Move'}")
+    # print("-" * 50)
+    # for name, hits, ev, nature, move in results:
+    #     nature_str = "Neutral" if nature == 1.0 else "Boosted"
+    #     print(f"{name:<15} {hits:<8.2f} {ev:<5} {nature_str:<7} {move}")
+
+
+    # Rhypherior
     attacker_stats = {
         "hp": 190,
         "attack": 211,
@@ -253,19 +287,19 @@ def main():
     moves = [
         (100, "ground", False),  # Earthquake
         (80, "dark", False),  # Crunch
-        (150, "rock", False) # Rock Wrecker
+        (150, "rock", False)  # Rock Wrecker
     ]
     #
-    # results2 = calculate_survivability(pokemon_map, attacker_stats, moves)
-    # for name, hits in results2:
-    #     print(f"{name:<20} | Hits survived: {hits:.2f}")
+    survive_results2 = calculate_survivability(pokemon_map, attacker_stats, moves)
+    # for name, hits in survive_results2:
+    #     print(f"{name} | Hits survived: {hits:.2f}")
 
-    results2 = find_best_attack_against_target(
-            pokemon_map,
-            attacker_stats
+    attack_results2 = find_best_attack_against_target(
+        pokemon_map,
+        attacker_stats
     )
-    for name, hits, move in results2:
-        print(f"{name:<20} | Hits survived: {hits:<10.2f} | Move: {move}")
+    # for name, hits, move in attack_results2:
+    #     print(f"{name} | Hits survived: {hits:.2f} | Move: {move}")
 
     # dragonite
     attacker_stats = {
@@ -279,32 +313,46 @@ def main():
     }
     moves = [
         (80, "dragon", False),  # Dragon Claw
-        (60, "flying", False) # Aerial Acs
+        (60, "flying", False)  # Aerial Acs
     ]
 
-    # results3 = calculate_survivability(pokemon_map, attacker_stats, moves)
-    # for name, hits in results3:
-    #     print(f"{name:<20} | Hits survived: {hits:.2f}")
+    survive_results3 = calculate_survivability(pokemon_map, attacker_stats, moves)
+    # for name, hits in survive_results3:
+    #     print(f"{name} | Hits survived: {hits:.2f}")
 
-    results3 = find_best_attack_against_target(
-            pokemon_map,
-            attacker_stats
+    attack_results3 = find_best_attack_against_target(
+        pokemon_map,
+        attacker_stats
     )
-    for name, hits, move in results3:
-        print(f"{name:<20} | Hits survived: {hits:<10.2f} | Move: {move}")
+    # for name, hits, move in attack_results3:
+    #     print(f"{name} | Hits survived: {hits:<10.2f} | Move: {move}")
 
-    # intersection = intersect_survivability(results1, results2, results3)
-    # for name, hits_list in intersection:
+    survive_intersection = intersect_survivability(survive_results1, survive_results2, survive_results3)
+    # for name, hits_list in survive_intersection:
     #     hits_str = " | ".join(f"{hits:.2f}" for hits in hits_list)
-    #     print(f"{name:<20} | Hits per opponent: {hits_str}")
+    #     print(f"{name} | Hits per opponent: {hits_str}")
 
-    inter = intersect_attack_results(results1, results2, results3)
-    for name, results in inter:
-        print(f"{name:<20}", end=" | ")
-        for hits, move in results:
-            print(f"{hits:.2f} ({move})", end=" | ")
-        print()
+    attack_intersection = intersect_attack_results(attack_results1, attack_results2, attack_results3)
+    # for name, results in attack_intersection:
+    #     print(f"{name}", end=" | ")
+    #     for hits, move in results:
+    #         print(f"{hits:.2f} ({move})", end=" | ")
+    #     print()
 
+    survival_map = {name: hits for name, hits in survive_intersection}
+    attack_map = {name: results for name, results in attack_intersection}
+
+    # Find common Pokémon
+    shared_names = set(survival_map) & set(attack_map)
+
+    for name in sorted(shared_names):
+        hits_list = survival_map[name]
+        attacks = attack_map[name]
+
+        hits_str = " | ".join(f"{h:.2f}" for h in hits_list)
+        attack_str = " | ".join(f"{h:.2f} ({m})" for h, m in attacks)
+
+        print(f"{name} | Hits per opponent: {hits_str} | Attacks: {attack_str}")
 
 
 if __name__ == '__main__':

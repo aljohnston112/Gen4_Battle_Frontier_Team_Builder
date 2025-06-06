@@ -18,7 +18,6 @@ from data_class.Category import convert_to_attack_category
 from data_class.Pokemon import Pokemon
 from data_class.PokemonInformation import PokemonInformation
 from data_class.PokemonType import convert_to_pokemon_type
-from data_class.Stat import Stat, StatEnum
 from data_class.Stats import Stats
 
 base_url = "https://www.serebii.net/pokedex-dp/"
