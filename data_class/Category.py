@@ -4,7 +4,7 @@ from enum import unique, Enum
 @unique
 class Category(Enum):
     """
-    Represents whether a Pokemon move of physical or special.
+    Represents whether a Pokémon move of physical or special.
     """
     PHYSICAL = "physical"
     SPECIAL = "special"

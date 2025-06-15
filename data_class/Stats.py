@@ -4,7 +4,7 @@ from attr import frozen
 @frozen
 class Stats:
     """
-    Represents the base stats of a Pokemon.
+    Represents the base stats of a Pokémon.
     """
 
     name: str

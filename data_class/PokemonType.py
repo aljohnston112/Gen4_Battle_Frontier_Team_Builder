@@ -4,7 +4,7 @@ from enum import Enum, unique
 @unique
 class PokemonType(Enum):
     """
-    Represents the Pokemon types.
+    Represents the Pokémon types.
     """
     NORMAL = "normal"
     FIGHTING = "fighting"
@@ -51,7 +51,7 @@ pokemon_types = [t for t in PokemonType]
 
 def convert_to_pokemon_type(pokemon_type: str) -> PokemonType:
     """
-    Gets the enum representing a Pokemon type.
+    Gets the enum representing a Pokémon type.
     :param pokemon_type: The string of the type.
     :return: The enum representing pokemon_type.
     """

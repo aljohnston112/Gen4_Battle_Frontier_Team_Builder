@@ -1,4 +1,5 @@
 import json
+import pprint
 
 from Config import POKEMON_INDICES_FILE
 
@@ -15,4 +16,4 @@ def get_pokemon_name_to_index():
 
 if __name__ == "__main__":
     index_to_pokemon = get_index_to_pokemon()
-    pass
+    pprint.pp(index_to_pokemon)

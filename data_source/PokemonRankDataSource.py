@@ -1,9 +1,6 @@
-import copy
-import json
 from collections import defaultdict
-from os.path import exists
 
-from data_class.TypeChartDataSource import get_defender_type_dict
+from data_source.TypeChartDataSource import get_defender_type_dict
 
 level = 50
 defender_type_chart = get_defender_type_dict()

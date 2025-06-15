@@ -1,5 +1,6 @@
 import json
 import os
+import pprint
 import random
 import time
 import urllib.request
@@ -12,7 +13,7 @@ from bs4 import BeautifulSoup
 
 from Config import POKEMON_FILE
 from data_class.AllStats import AllStats
-from data_class.Attack import Attack
+from data_class.Move import Move
 from data_class.BaseStats import BaseStats
 from data_class.Category import convert_to_attack_category
 from data_class.Pokemon import Pokemon
@@ -155,7 +156,7 @@ def get_level_up_attacks(dextable):
             effect_chance = 0
         effect_chance = int(effect_chance)
         level_to_attacks[level].append(
-            Attack(
+            Move(
                 name=name,
                 pokemon_type=convert_to_pokemon_type(pokemon_type),
                 category=convert_to_attack_category(category),
@@ -208,7 +209,7 @@ def get_tm_and_hm_attacks(dextable):
         if effect_chance == "--":
             effect_chance = 0
         effect_chance = int(effect_chance)
-        tm_or_hm_to_attack[tm_or_hm] = Attack(
+        tm_or_hm_to_attack[tm_or_hm] = Move(
             name=name,
             pokemon_type=convert_to_pokemon_type(pokemon_type),
             category=convert_to_attack_category(category),
@@ -283,7 +284,7 @@ def get_attacks(dextable):
             effect_chance = 0
         effect_chance = int(effect_chance)
         attacks.append(
-            Attack(
+            Move(
                 name=name,
                 pokemon_type=convert_to_pokemon_type(pokemon_type),
                 category=convert_to_attack_category(category),
@@ -335,7 +336,7 @@ def get_third_gen_moves(dextable):
             current_index += 1
         else:
             attack = (
-                Attack(
+                Move(
                     name=name,
                     pokemon_type=convert_to_pokemon_type(pokemon_type),
                     category=convert_to_attack_category(category),
@@ -395,7 +396,7 @@ def get_forms_move_tutor_attacks(dextable):
             current_index += 1
         else:
             attack = (
-                Attack(
+                Move(
                     name=name,
                     pokemon_type=convert_to_pokemon_type(pokemon_type),
                     category=convert_to_attack_category(category),
@@ -566,7 +567,7 @@ def get_pre_evolution_moves(dextable):
                 effect_chance = 0
             effect_chance = int(effect_chance)
             attack = (
-                Attack(
+                Move(
                     name=name,
                     pokemon_type=convert_to_pokemon_type(pokemon_type),
                     category=convert_to_attack_category(category),
@@ -632,7 +633,7 @@ def get_tm_and_hm_attacks_for_forms(dextable):
             current_index += 1
         else:
             attack = (
-                Attack(
+                Move(
                     name=name,
                     pokemon_type=convert_to_pokemon_type(pokemon_type),
                     category=convert_to_attack_category(category),
@@ -902,4 +903,4 @@ def get_pokemon() -> Dict[int, Pokemon]:
 
 if __name__ == "__main__":
     pokemon_index_to_pokemon = get_pokemon()
-    pass
+    pprint.pp(pokemon_index_to_pokemon)

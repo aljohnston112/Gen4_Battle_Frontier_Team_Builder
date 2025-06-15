@@ -1,0 +1,300 @@
+001 	Youngster 	Jim 	✔ 							
+002 	Youngster 	Erroll 	✔ 							
+003 	Youngster 	Casimir 	✔ 							
+004 	Lass 	Cameron 	✔ 							
+005 	Lass 	Peaches 	✔ 							
+006 	Lass 	Yasmin 	✔ 							
+007 	School Kid♂ 	Foster 	✔ 							
+008 	School Kid♂ 	Ken 	✔ 							
+009 	School Kid♂ 	Owen 	✔ 							
+010 	School Kid♀ 	Marcy 	✔ 							
+011 	School Kid♀ 	Shelly 	✔ 							
+012 	School Kid♀ 	Aspen 	✔ 							
+013 	Rich Boy 	Matt 	✔ 							
+014 	Rich Boy 	Alvan 	✔ 							
+015 	Rich Boy 	Asa 	✔ 							
+016 	Lady 	Isabel 	✔ 							
+017 	Lady 	Nichole 	✔ 							
+018 	Lady 	Juanita 	✔ 							
+019 	Camper 	Bernard 	✔ 							
+020 	Camper 	Herbert 	✔ 							
+021 	Camper 	Colbert 	✔ 							
+022 	Picnicker 	Maggie 	✔ 							
+023 	Picnicker 	Melanie 	✔ 							
+024 	Picnicker 	Ann 	✔ 							
+025 	Tuber♂ 	Manford 	✔ 							
+026 	Tuber♂ 	Hank 	✔ 							
+027 	Tuber♂ 	Percy 	✔ 							
+028 	Tuber♀ 	Dakota 	✔ 							
+029 	Tuber♀ 	Jenny 	✔ 							
+030 	Tuber♀ 	Tia 	✔ 							
+031 	Guitarist 	Malcolm 	✔ 							
+032 	Guitarist 	Tad 	✔ 							
+033 	Guitarist 	Concord 	✔ 							
+034 	Idol 	Penny 	✔ 							
+035 	Idol 	Lana 	✔ 							
+036 	Idol 	Crimson 	✔ 							
+037 	Pokéfan♂ 	Ewan 	✔ 							
+038 	Pokéfan♂ 	Kane 	✔ 							
+039 	Pokéfan♂ 	Theo 	✔ 							
+040 	Pokéfan♀ 	Alexia 	✔ 							
+041 	Pokéfan♀ 	Luna 	✔ 							
+042 	Pokéfan♀ 	Celene 	✔ 							
+043 	Waiter 	Cyan 	✔ 							
+044 	Waiter 	Indigo 	✔ 							
+045 	Waiter 	Orin 	✔ 							
+046 	Waitress 	Ashley 	✔ 							
+047 	Waitress 	Noelle 	✔ 							
+048 	Waitress 	Kandace 	✔ 							
+049 	Bug Catcher 	Floyd 	✔ 							
+050 	Bug Catcher 	Hoffman 	✔ 							
+051 	Bug Catcher 	Amadeus 	✔ 							
+052 	Ninja Boy 	Shia 	✔ 							
+053 	Ninja Boy 	Vincent 	✔ 							
+054 	Ninja Boy 	Pierre 	✔ 							
+055 	Poké Kid 	Alice 	✔ 							
+056 	Poké Kid 	Anita 	✔ 							
+057 	Poké Kid 	Allison 	✔ 							
+058 	Fisherman 	Kiefer 	✔ 							
+059 	Fisherman 	Basil 	✔ 							
+060 	Ruin Maniac 	Henrik 	✔ 							
+061 	Ruin Maniac 	Aubry 	✔ 							
+062 	Collector 	Upton 	✔ 							
+063 	Collector 	Emil 	✔ 							
+064 	Parasol Lady 	Bridget 	✔ 							
+065 	Parasol Lady 	Blanche 	✔ 							
+066 	Parasol Lady 	Colette 	✔ 							
+067 	Beauty 	Tiffany 	✔ 							
+068 	Beauty 	Britney 	✔ 							
+069 	Beauty 	Harmony 	✔ 							
+070 	Aroma Lady 	Lucy 	✔ 							
+071 	Aroma Lady 	Jackie 	✔ 							
+072 	Aroma Lady 	Kara 	✔ 							
+073 	Guitarist 	Bernie 	✔ 							
+074 	Guitarist 	Curtis 	✔ 							
+075 	Bird Keeper 	Nancy 	✔ 							
+076 	Bird Keeper 	Trinity 	✔ 							
+077 	Bird Keeper 	Shawna 	✔ 							
+078 	Sailor 	Layton 	✔ 							
+079 	Sailor 	Godwin 	✔ 							
+080 	Hiker 	Everett 	✔ 							
+081 	Hiker 	Raiden 	✔ 	✔ 						
+082 	Idol 	Ada 	✔ 	✔ 						
+083 	Idol 	Annie 	✔ 	✔ 						
+084 	Idol 	Basia 	✔ 	✔ 						
+085 	Jogger 	Steve 	✔ 	✔ 						
+086 	Jogger 	Dave 	✔ 	✔ 						
+087 	Worker 	Shane 	✔ 	✔ 						
+088 	Worker 	Benji 	✔ 	✔ 						
+089 	Rancher 	Pierce 	✔ 	✔ 						
+090 	Rancher 	Etienne 	✔ 	✔ 						
+091 	Rancher 	Leon 	✔ 	✔ 						
+092 	Cowgirl 	Doris 	✔ 	✔ 						
+093 	Cowgirl 	Paisley 	✔ 	✔ 						
+094 	Cowgirl 	Leslie 	✔ 	✔ 						
+095 	Cameraman 	Hudson 	✔ 	✔ 						
+096 	Cameraman 	Xenon 	✔ 	✔ 						
+097 	Cameraman 	Amleth 	✔ 	✔ 						
+098 	Reporter 	Dot 	✔ 	✔ 						
+099 	Reporter 	Marble 	✔ 	✔ 						
+100 	Reporter 	Gingham 	✔ 	✔ 						
+101 	Cyclist♂ 	Gaspar 	✔ 	✔ 	✔ 					
+102 	Cyclist♂ 	Ignatio 	✔ 	✔ 	✔ 					
+103 	Cyclist♀ 	Kaylene 	✔ 	✔ 	✔ 					
+104 	Cyclist♀ 	Kaya 	✔ 	✔ 	✔ 					
+105 	Black Belt 	Clement 	✔ 	✔ 	✔ 					
+106 	Black Belt 	Mason 	✔ 	✔ 	✔ 					
+107 	Battle Girl 	Kodi 	✔ 	✔ 	✔ 					
+108 	Battle Girl 	Aileen 	✔ 	✔ 	✔ 					
+109 	Black Belt 	Jericho 	✔ 	✔ 	✔ 					
+110 	Black Belt 	Harris 	✔ 	✔ 	✔ 					
+111 	Black Belt 	Soren 	✔ 	✔ 	✔ 					
+112 	Battle Girl 	Trina 	✔ 	✔ 	✔ 					
+113 	Battle Girl 	Alta 	✔ 	✔ 	✔ 					
+114 	Battle Girl 	Ingrid 	✔ 	✔ 	✔ 					
+115 	Veteran 	Beck 	✔ 	✔ 	✔ 					
+116 	Veteran 	Eric 	✔ 	✔ 	✔ 					
+117 	Veteran 	Padgett 	✔ 	✔ 	✔ 					
+118 	Socialite 	Barbara 	✔ 	✔ 	✔ 					
+119 	Socialite 	Isabel 	✔ 	✔ 	✔ 					
+120 	Socialite 	Carmen 	✔ 	✔ 	✔ 					
+121 	Psychic♂ 	Alpha 		✔ 	✔ 	✔ 				
+122 	Psychic♂ 	Beta 		✔ 	✔ 	✔ 				
+123 	Psychic♂ 	Essie 		✔ 	✔ 	✔ 				
+124 	Psychic♀ 	Amelia 		✔ 	✔ 	✔ 				
+125 	Psychic♀ 	Celine 		✔ 	✔ 	✔ 				
+126 	Psychic♀ 	Jillian 		✔ 	✔ 	✔ 				
+127 	Pokémon Breeder♂ 	Howard 		✔ 	✔ 	✔ 				
+128 	Pokémon Breeder♂ 	Derrell 		✔ 	✔ 	✔ 				
+129 	Pokémon Breeder♂ 	Baldwin 		✔ 	✔ 	✔ 				
+130 	Pokémon Breeder♀ 	Adriana 		✔ 	✔ 	✔ 				
+131 	Pokémon Breeder♀ 	Sonya 		✔ 	✔ 	✔ 				
+132 	Pokémon Breeder♀ 	Tatyana 		✔ 	✔ 	✔ 				
+133 	Gentleman 	Zante 		✔ 	✔ 	✔ 				
+134 	Gentleman 	Giliam 		✔ 	✔ 	✔ 				
+135 	Roughneck 	Rodney 		✔ 	✔ 	✔ 				
+136 	Roughneck 	Rainier 		✔ 	✔ 	✔ 				
+137 	Scientist 	Jean 		✔ 	✔ 	✔ 				
+138 	Scientist 	Brad 		✔ 	✔ 	✔ 				
+139 	Clown 	Francis 		✔ 	✔ 	✔ 				
+140 	Clown 	Prescot 		✔ 	✔ 	✔ 				
+141 	Ace Trainer♂ 	Yardley 			✔ 	✔ 	✔ 			
+142 	Ace Trainer♂ 	Stavros 			✔ 	✔ 	✔ 			
+143 	Ace Trainer♂ 	Zane 			✔ 	✔ 	✔ 			
+144 	Ace Trainer♀ 	Kim 			✔ 	✔ 	✔ 			
+145 	Ace Trainer♀ 	Macy 			✔ 	✔ 	✔ 			
+146 	Ace Trainer♀ 	Faun 			✔ 	✔ 	✔ 			
+147 	Pokémon Ranger♂ 	Doyle 			✔ 	✔ 	✔ 			
+148 	Pokémon Ranger♂ 	Duke 			✔ 	✔ 	✔ 			
+149 	Pokémon Ranger♂ 	Deacon 			✔ 	✔ 	✔ 			
+150 	Pokémon Ranger♀ 	Mena 			✔ 	✔ 	✔ 			
+151 	Pokémon Ranger♀ 	Mercy 			✔ 	✔ 	✔ 			
+152 	Pokémon Ranger♀ 	Evita 			✔ 	✔ 	✔ 			
+153 	Dragon Tamer 	Harold 			✔ 	✔ 	✔ 			
+154 	Dragon Tamer 	Herman 			✔ 	✔ 	✔ 			
+155 	Dragon Tamer 	Emmett 			✔ 	✔ 	✔ 			
+156 	Dragon Tamer 	Erich 			✔ 	✔ 	✔ 			
+157 	Ace Trainer♂* 	Garvey 			✔ 	✔ 	✔ 			
+158 	Ace Trainer♂* 	Cruz 			✔ 	✔ 	✔ 			
+159 	Ace Trainer♀* 	Pamela 			✔ 	✔ 	✔ 			
+160 	Ace Trainer♀* 	Daniela 			✔ 	✔ 	✔ 			
+161 	Youngster 	Kaden 				✔ 	✔ 	✔ 		
+162 	Youngster 	Kolby 				✔ 	✔ 	✔ 		
+163 	Lass 	Karissa 				✔ 	✔ 	✔ 		
+164 	Lass 	Liliana 				✔ 	✔ 	✔ 		
+165 	School Kid♂ 	Jonas 				✔ 	✔ 	✔ 		
+166 	School Kid♂ 	Keon 				✔ 	✔ 	✔ 		
+167 	School Kid♀ 	Chelsie 				✔ 	✔ 	✔ 		
+168 	School Kid♀ 	Regina 				✔ 	✔ 	✔ 		
+169 	Rich Boy 	Daulton 				✔ 	✔ 	✔ 		
+170 	Rich Boy 	Hanson 				✔ 	✔ 	✔ 		
+171 	Lady 	Amory 				✔ 	✔ 	✔ 		
+172 	Lady 	Juliana 				✔ 	✔ 	✔ 		
+173 	Bug Catcher 	Camui 				✔ 	✔ 	✔ 		
+174 	Bug Catcher 	Orlando 				✔ 	✔ 	✔ 		
+175 	Ninja Boy 	Zack 				✔ 	✔ 	✔ 		
+176 	Ninja Boy 	Vance 				✔ 	✔ 	✔ 		
+177 	Poké Kid 	Kyla 				✔ 	✔ 	✔ 		
+178 	Poké Kid 	Ruby 				✔ 	✔ 	✔ 		
+179 	Idol 	Kiley 				✔ 	✔ 	✔ 		
+180 	Idol 	Utah 				✔ 	✔ 	✔ 		
+181 	Jogger 	Colt 					✔ 	✔ 	✔ 	
+182 	Jogger 	Tory 					✔ 	✔ 	✔ 	
+183 	Fisherman 	Farley 					✔ 	✔ 	✔ 	
+184 	Fisherman 	Mark 					✔ 	✔ 	✔ 	
+185 	Ruin Maniac 	Samuel 					✔ 	✔ 	✔ 	
+186 	Ruin Maniac 	Penn 					✔ 	✔ 	✔ 	
+187 	Collector 	Marquez 					✔ 	✔ 	✔ 	
+188 	Collector 	Arnold 					✔ 	✔ 	✔ 	
+189 	Guitarist 	Fred 					✔ 	✔ 	✔ 	
+190 	Guitarist 	Chase 					✔ 	✔ 	✔ 	
+191 	Bird Keeper 	McKenna 					✔ 	✔ 	✔ 	
+192 	Bird Keeper 	Sally 					✔ 	✔ 	✔ 	
+193 	Sailor 	Casper 					✔ 	✔ 	✔ 	
+194 	Sailor 	Derrian 					✔ 	✔ 	✔ 	
+195 	Hiker 	Monty 					✔ 	✔ 	✔ 	
+196 	Hiker 	Rocky 					✔ 	✔ 	✔ 	
+197 	Policeman 	Reggie 					✔ 	✔ 	✔ 	
+198 	Policeman 	Quincy 					✔ 	✔ 	✔ 	
+199 	PI 	Neil 					✔ 	✔ 	✔ 	
+200 	PI 	Sergei 					✔ 	✔ 	✔ 	
+201 	Camper 	Freddy 						✔ 	✔ 	✔
+202 	Camper 	Andre 						✔ 	✔ 	✔
+203 	Picnicker 	Inga 						✔ 	✔ 	✔
+204 	Picnicker 	Tonya 						✔ 	✔ 	✔
+205 	Guitarist 	Tobias 						✔ 	✔ 	✔
+206 	Guitarist 	Cecil 						✔ 	✔ 	✔
+207 	Idol 	Maranda 						✔ 	✔ 	✔
+208 	Idol 	Helene 						✔ 	✔ 	✔
+209 	Pokéfan♂ 	Simon 						✔ 	✔ 	✔
+210 	Pokéfan♂ 	Turner 						✔ 	✔ 	✔
+211 	Pokéfan♀ 	Europa 						✔ 	✔ 	✔
+212 	Pokéfan♀ 	Pandora 						✔ 	✔ 	✔
+213 	Rancher 	Vern 						✔ 	✔ 	✔
+214 	Rancher 	Boris 						✔ 	✔ 	✔
+215 	Cowgirl 	Carly 						✔ 	✔ 	✔
+216 	Cowgirl 	Ginger 						✔ 	✔ 	✔
+217 	Pokémon Breeder♂ 	Peter 						✔ 	✔ 	✔
+218 	Pokémon Breeder♂ 	Tyron 						✔ 	✔ 	✔
+219 	Pokémon Breeder♀ 	Zorya 						✔ 	✔ 	✔
+220 	Pokémon Breeder♀ 	Antonia 						✔ 	✔ 	✔
+221 	Ace Trainer♂ 	Sawyer 							✔ 	✔
+222 	Ace Trainer♂ 	Charlie 							✔ 	✔
+223 	Ace Trainer♀ 	Chloe 							✔ 	✔
+224 	Ace Trainer♀ 	Daphne 							✔ 	✔
+225 	Ace Trainer♂* 	Thad 							✔ 	✔
+226 	Ace Trainer♂* 	Lew 							✔ 	✔
+227 	Ace Trainer♀* 	Opal 							✔ 	✔
+228 	Ace Trainer♀* 	Leda 							✔ 	✔
+229 	Pokémon Ranger♂ 	Geoff 							✔ 	✔
+230 	Pokémon Ranger♂ 	Gunther 							✔ 	✔
+231 	Pokémon Ranger♀ 	Alma 							✔ 	✔
+232 	Pokémon Ranger♀ 	Elise 							✔ 	✔
+233 	Dragon Tamer 	Harvey 							✔ 	✔
+234 	Dragon Tamer 	Nicolas 							✔ 	✔
+235 	Black Belt 	Fergus 							✔ 	✔
+236 	Black Belt 	Ronni 							✔ 	✔
+237 	Battle Girl 	Eve 							✔ 	✔
+238 	Battle Girl 	Mariane 							✔ 	✔
+239 	Veteran 	Costin 							✔ 	✔
+240 	Veteran 	Alfred 							✔ 	✔
+241 	Socialite 	Rioha 							✔ 	✔
+242 	Socialite 	Janice 							✔ 	✔
+243 	Psychic♂ 	Denver 							✔ 	✔
+244 	Psychic♂ 	Berkley 							✔ 	✔
+245 	Psychic♀ 	Irene 							✔ 	✔
+246 	Psychic♀ 	Sylvie 							✔ 	✔
+247 	Waiter 	Xander 							✔ 	✔
+248 	Waiter 	Warren 							✔ 	✔
+249 	Waitress 	Leslie 							✔ 	✔
+250 	Waitress 	Kathy 							✔ 	✔
+251 	Cameraman 	Darren 							✔ 	✔
+252 	Cameraman 	Skip 							✔ 	✔
+253 	Reporter 	Katie 							✔ 	✔
+254 	Reporter 	Elaine 							✔ 	✔
+255 	Cyclist♂ 	Clive 							✔ 	✔
+256 	Cyclist♂ 	Ward 							✔ 	✔
+257 	Cyclist♀ 	Hilda 							✔ 	✔
+258 	Cyclist♀ 	Vanita 							✔ 	✔
+259 	PI 	Ralph 							✔ 	✔
+260 	PI 	Conway 							✔ 	✔
+261 	Idol 	Kristi 							✔ 	✔
+262 	Idol 	Trista 							✔ 	✔
+263 	Jogger 	Austin 							✔ 	✔
+264 	Jogger 	Dimitri 							✔ 	✔
+265 	Fisherman 	Delaney 							✔ 	✔
+266 	Fisherman 	Keaton 							✔ 	✔
+267 	Sailor 	Carlo 							✔ 	✔
+268 	Sailor 	Horatio 							✔ 	✔
+269 	Hiker 	Lyle 							✔ 	✔
+270 	Hiker 	Glen 							✔ 	✔
+271 	Ruin Maniac 	Isadore 							✔ 	✔
+272 	Ruin Maniac 	Walton 							✔ 	✔
+273 	Guitarist 	Roget 							✔ 	✔
+274 	Guitarist 	Iggy 							✔ 	✔
+275 	Collector 	Leroy 							✔ 	✔
+276 	Collector 	Newman 							✔ 	✔
+277 	Roughneck 	Ross 							✔ 	✔
+278 	Roughneck 	Ron 							✔ 	✔
+279 	Scientist 	Irwin 							✔ 	✔
+280 	Scientist 	Flynn 							✔ 	✔
+281 	Gentleman 	Joachim 							✔ 	✔
+282 	Gentleman 	Karston 							✔ 	✔
+283 	Worker 	Boyce 							✔ 	✔
+284 	Worker 	Tyrell 							✔ 	✔
+285 	Clown 	Frank 							✔ 	✔
+286 	Clown 	Enzo 							✔ 	✔
+287 	Policeman 	Hugh 							✔ 	✔
+288 	Policeman 	Kegan 							✔ 	✔
+289 	PI 	Chester 							✔ 	✔
+290 	PI 	River 							✔ 	✔
+291 	Bird Keeper 	Kira 							✔ 	✔
+292 	Bird Keeper 	Eliza 							✔ 	✔
+293 	Parasol Lady 	Angie 							✔ 	✔
+294 	Parasol Lady 	Sami 							✔ 	✔
+295 	Beauty 	Nadia 							✔ 	✔
+296 	Beauty 	Becky 							✔ 	✔
+297 	Aroma Lady 	Elisha 							✔ 	✔
+298 	Aroma Lady 	Ambre 							✔ 	✔
+299 	Idol 	Cocoa 							✔ 	✔
+300 	Idol 	Nissa 							✔ 	✔ 
