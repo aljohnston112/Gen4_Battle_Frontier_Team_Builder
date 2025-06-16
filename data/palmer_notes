@@ -6,6 +6,66 @@ EVs: 252 HP / 252 SpA
 - Surf
 - Ice Beam
 
+Abomasnow
+Level: 50
+Adamant Nature
+Ability: Snow Warning
+EVs: 252 Atk / 224 Spe
+IVs: 0 HP / 11 Atk / 0 Def / 0 SpA / 0 SpD / 18 Spe
+- Wood Hammer
+
+Torterra
+Level: 50
+Serious Nature
+Ability: Overgrow
+EVs: 252 Atk / 252 Spe
+IVs: 0 HP / 3 Atk / 0 Def / 0 SpA / 0 SpD / 19 Spe
+- Wood Hammer
+
+Exeggutor @ Miracle Seed
+Level: 50
+Hasty Nature
+Ability: Chlorophyll
+EVs: 176 Atk / 252 Spe
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 3 Spe
+- Wood Hammer
+
+Electivire @ Life Orb
+Level: 50
+Adamant Nature
+Ability: Motor Drive
+EVs: 252 Atk / 16 Spe
+IVs: 0 HP / 9 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+- Thunder Punch
+
+Victreebel @ Miracle Seed
+Level: 50
+Adamant Nature
+Ability: Chlorophyll
+EVs: 252 Atk / 216 Spe
+IVs: 0 HP / 15 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+- Leaf Blade
+
+Breloom @ Miracle Seed
+Level: 50
+Adamant Nature
+Ability: Effect Spore
+EVs: 252 Atk / 216 Spe
+IVs: 0 HP / 1 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+- Seed Bomb
+
+Leafeon @ Life Orb
+Level: 50
+Adamant Nature
+Ability: Leaf Guard
+EVs: 252 Atk / 16 Spe
+IVs: 0 HP / 15 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+- Seed Bomb
+
+
+
+
+
 Rhyperior
 Level: 50
 Adamant Nature
@@ -15,80 +75,50 @@ EVs: 252 Atk / 252 Def
 - Earthquake
 - Crunch
 
+Torterra Above
 
-
-Abomasnow
-Level: 50
-Adamant Nature
-Ability: Snow Warning
-EVs: 252 Atk / 224 Spe
-IVs: 0 HP / 11 Atk / 0 Def / 0 SpA / 0 SpD / 18 Spe
-- Wood Hammer
-
-Abomasnow
-1.7	    0.26	0.65
-1.68 (Wood Hammer) 	 0.91 (Energy Ball) 	 1.26 (Ice Punch)
-For Milotic:
-    11 attack IV with nature
-    18 speed IV
-
-Out classed by Abomasnow
-    Torterra
-    Level: 50
-    Serious Nature
-    Ability: Overgrow
-    EVs: 252 Atk
-    IVs: 0 HP / 3 Atk / 0 Def / 0 SpA / 0 SpD / 19 Spe
-    - Wood Hammer
-
-    Torterra
-    0.44	1.45	0.92
-    1.44 (Wood Hammer) 	 1.10 (Energy Ball) 	 4.88 (Return)
-    For Milotic:
-        3 attack IV or nature
-        19 speed IV or 1 IV and nature
-
-
-    Exeggutor
-    Level: 50
-    Hasty Nature
-    Ability: Chlorophyll
-    EVs: 252 Atk / 252 Spe
-    IVs: 0 HP / 0 Def / 0 SpA / 0 SpD / 3 Spe
-    - Wood Hammer
-
-    Exeggutor
-    0.69	0.59	0.75
-    1.60 (Wood Hammer) 	 0.68 (Energy Ball) 	 4.15 (Psychic)
-    For Milotic:
-        31 attack IV
-        3 speed IV with nature
-
-
-
-Hippowdon
+Garchomp
 Level: 50
 Hardy Nature
-Ability: Sand Stream
-EVs: 232 SpA / 72 Spe
+Ability: Sand Veil
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+- Surf
+
+Donphan
+Level: 50
+Hardy Nature
+Ability: Sturdy
+EVs: 224 SpA / 48 Spe
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 - Earth Power
 
-Hippowdon
-0.54	1.3	    1.66
-3.37 (Earthquake) 	 2.11 (Earth Power) 	 3.95 (Double-edge)
-For Rhyperior:
-    0 IVs
 
-Hippowdon picked due to synergy with Abomasnow
-    Garchomp
-    Level: 50
-    Hardy Nature
-    Ability: Sand Veil
-    EVs: 252 Def
-    IVs: 0 HP / 0 Atk / 0 SpA / 0 SpD / 0 Spe
-    - Surf
+Dragonite
+Level: 50
+Hardy Nature
+Ability: Inner Focus
+EVs: 252 Atk / 252 SpD
 
-    Garchomp
-    0.48	1.07	0.68
-    2.93 (Earthquake) 	 1.28 (Surf) 	 1.69 (Dragon Claw)
+
+
+
+Machamp for Regigigas
+
+
+
+
+
+Cresselia
+Level: 50
+Hardy Nature
+Ability: Levitate
+EVs: 170 HP / 170 Def / 170 SpD
+
+Also good for either Dragonite and Rhyperior with focus sash
+Sharpedo
+Level: 50
+Adamant Nature
+Ability: Rough Skin
+EVs: 252 Atk / 40 Spe
+IVs: 0 HP / 29 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+- Crunch

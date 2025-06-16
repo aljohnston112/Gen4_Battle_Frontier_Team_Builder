@@ -19,11 +19,10 @@ class FrontierPokemon:
     types: list[PokemonType]
     item: str
     moves: list[Move]
-    set_number: int
     effort_values: list[Stat]
 
     def __hash__(self) -> int:
-        return hash(self.name)
+        return hash(self.name) + hash(tuple(self.moves))
 
     def __repr__(self) -> str:
         return self.name
@@ -61,8 +60,8 @@ def __parse_effort_value__(stat_enum, stat_token):
     return Stat(stat_enum, ev)
 
 
-def __parse_frontier_pokemon__() -> dict[int, set[FrontierPokemon]]:
-    pokemon = defaultdict(lambda: set())
+def get_frontier_pokemon() -> defaultdict[str, tuple[list[int], set[FrontierPokemon]]]:
+    pokemon :defaultdict[str, tuple[set[int], set[FrontierPokemon]]] = defaultdict(lambda: (set(), set()))
     set_to_trainers = __parse_trainers__()
     all_pokemon_types: dict[str, list[PokemonType]] = get_pokemon_types()
     pokemon_moves = get_moves()
@@ -112,18 +111,17 @@ def __parse_frontier_pokemon__() -> dict[int, set[FrontierPokemon]]:
                                            pokemon_tokens[13]),
                     __parse_effort_value__(StatEnum.SPEED, pokemon_tokens[14]),
                 ]
-                for set_number in sets:
-                    p = FrontierPokemon(
-                        name=name,
-                        nature=nature,
-                        types=all_pokemon_types[name],
-                        item=item,
-                        moves=moves,
-                        set_number=-1,
-                        effort_values=effort_values
-                    )
-                    pokemon[set_number].add(p)
-
+                p = FrontierPokemon(
+                    name=name,
+                    nature=nature,
+                    types=all_pokemon_types[name],
+                    item=item,
+                    moves=moves,
+                    effort_values=effort_values
+                )
+                for s in sets:
+                    pokemon[",".join(names)][0].add(s)
+                pokemon[",".join(names)][1].add(p)
     return pokemon
 
 
@@ -131,5 +129,5 @@ if __name__ == '__main__':
     g_set_to_trainer = __parse_trainers__()
     pprint.pprint(g_set_to_trainer)
 
-    g_set_pokemon__ = __parse_frontier_pokemon__()
+    g_set_pokemon__ = get_frontier_pokemon()
     pprint.pprint(g_set_pokemon__)
