@@ -21,5 +21,5 @@ def get_move_map() -> dict[str, Move]:
 
 
 if __name__ == '__main__':
-    moves: dict[str, Move] = get_move_map()
-    pprint.pprint(moves)
+    g_moves: dict[str, Move] = get_move_map()
+    pprint.pprint(g_moves)

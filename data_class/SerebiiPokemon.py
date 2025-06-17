@@ -5,14 +5,13 @@ from data_class.AllStats import AllStats
 from data_class.Move import Move
 from data_class.PokemonInformation import PokemonInformation
 
-
 LevelToAttacks = dict[int, list[Move]]
 TmOrHmToAttacks = dict[str, Move]
 FormToAttacks = dict[str, list[Move]]
 
 
 @frozen
-class Pokemon:
+class SerebiiPokemon:
     pokemon_information: PokemonInformation
     all_stats: AllStats
     level_to_attacks: LevelToAttacks

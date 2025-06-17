@@ -1,95 +1,92 @@
 {
   "type_to_super_effective": {
-    "normal": [
-      "fighting"
-    ],
-    "rock": [
-      "fighting",
-      "ground",
+    "fighting": [
+      "normal",
+      "rock",
       "steel",
-      "water",
+      "ice",
+      "dark"
+    ],
+    "flying": [
+      "fighting",
+      "bug",
       "grass"
     ],
-    "steel": [
-      "fighting",
-      "ground",
-      "fire"
+    "poison": [
+      "grass"
     ],
-    "ice": [
-      "fighting",
+    "ground": [
+      "poison",
       "rock",
       "steel",
-      "fire"
+      "fire",
+      "electric"
     ],
-    "dark": [
-      "fighting",
-      "bug"
-    ],
-    "fighting": [
+    "rock": [
       "flying",
-      "psychic"
-    ],
-    "bug": [
-      "flying",
-      "rock",
-      "fire"
-    ],
-    "grass": [
-      "flying",
-      "poison",
       "bug",
       "fire",
       "ice"
     ],
-    "poison": [
-      "ground",
+    "bug": [
+      "grass",
+      "psychic",
+      "dark"
+    ],
+    "ghost": [
+      "ghost",
       "psychic"
     ],
+    "steel": [
+      "rock",
+      "ice"
+    ],
     "fire": [
+      "bug",
+      "steel",
+      "grass",
+      "ice"
+    ],
+    "water": [
+      "ground",
+      "rock",
+      "fire"
+    ],
+    "grass": [
       "ground",
       "rock",
       "water"
     ],
     "electric": [
-      "ground"
-    ],
-    "flying": [
-      "rock",
-      "electric",
-      "ice"
+      "flying",
+      "water"
     ],
     "psychic": [
-      "bug",
-      "ghost",
-      "dark"
+      "fighting",
+      "poison"
     ],
-    "ghost": [
-      "ghost",
-      "dark"
-    ],
-    "ground": [
-      "water",
+    "ice": [
+      "flying",
+      "ground",
       "grass",
-      "ice"
-    ],
-    "water": [
-      "grass",
-      "electric"
+      "dragon"
     ],
     "dragon": [
-      "ice",
       "dragon"
+    ],
+    "dark": [
+      "ghost",
+      "psychic"
     ]
   },
   "type_to_normal_effective": {
     "normal": [
       "normal",
+      "fighting",
       "flying",
       "poison",
       "ground",
-      "rock",
       "bug",
-      "steel",
       "fire",
       "water",
       "grass",
@@ -100,40 +97,36 @@
       "dark"
     ],
     "fighting": [
-      "normal",
       "fighting",
-      "poison",
       "ground",
-      "ghost",
-      "steel",
       "fire",
       "water",
       "grass",
       "electric",
-      "ice",
       "dragon"
     ],
     "flying": [
       "normal",
       "flying",
       "poison",
+      "ground",
       "ghost",
-      "steel",
       "fire",
       "water",
       "psychic",
+      "ice",
       "dragon",
       "dark"
     ],
     "poison": [
       "normal",
+      "fighting",
       "flying",
-      "rock",
-      "ghost",
-      "steel",
+      "bug",
       "fire",
       "water",
       "electric",
+      "psychic",
       "ice",
       "dragon",
       "dark"
@@ -141,26 +134,60 @@
     "ground": [
       "normal",
       "fighting",
-      "flying",
       "ground",
-      "bug",
       "ghost",
-      "steel",
-      "fire",
+      "water",
+      "psychic",
+      "ice",
+      "dragon",
+      "dark"
+    ],
+    "rock": [
+      "normal",
+      "poison",
+      "rock",
+      "ghost",
+      "water",
+      "grass",
+      "electric",
       "psychic",
       "dragon",
       "dark"
     ],
     "bug": [
       "normal",
-      "poison",
+      "ground",
+      "rock",
       "bug",
-      "ghost",
-      "steel",
       "water",
       "electric",
-      "psychic",
       "ice",
+      "dragon"
+    ],
+    "ghost": [
+      "fighting",
+      "flying",
+      "poison",
+      "ground",
+      "rock",
+      "bug",
+      "fire",
+      "water",
+      "grass",
+      "electric",
+      "ice",
+      "dragon"
+    ],
+    "steel": [
+      "normal",
+      "fighting",
+      "flying",
+      "poison",
+      "ground",
+      "bug",
+      "ghost",
+      "grass",
+      "psychic",
       "dragon",
       "dark"
     ],
@@ -169,10 +196,10 @@
       "fighting",
       "flying",
       "poison",
+      "ground",
       "ghost",
       "electric",
       "psychic",
-      "dragon",
       "dark"
     ],
     "water": [
@@ -180,22 +207,21 @@
       "fighting",
       "flying",
       "poison",
-      "ground",
-      "rock",
       "bug",
       "ghost",
+      "steel",
+      "electric",
       "psychic",
-      "dragon",
+      "ice",
       "dark"
     ],
     "grass": [
       "normal",
       "fighting",
-      "rock",
       "ghost",
-      "steel",
+      "electric",
       "psychic",
-      "dragon",
+      "ice",
       "dark"
     ],
     "electric": [
@@ -205,21 +231,19 @@
       "rock",
       "bug",
       "ghost",
+      "steel",
       "fire",
-      "water",
-      "grass",
       "psychic",
       "ice",
-      "dragon",
       "dark"
     ],
     "psychic": [
       "normal",
       "flying",
-      "poison",
       "ground",
       "rock",
-      "steel",
+      "bug",
+      "ghost",
       "fire",
       "water",
       "grass",
@@ -229,16 +253,13 @@
     ],
     "ice": [
       "normal",
-      "flying",
+      "fighting",
       "poison",
-      "ground",
+      "rock",
       "bug",
       "ghost",
-      "water",
-      "grass",
       "electric",
       "psychic",
-      "dragon",
       "dark"
     ],
     "dragon": [
@@ -250,8 +271,12 @@
       "rock",
       "bug",
       "ghost",
-      "steel",
+      "fire",
+      "water",
+      "grass",
+      "electric",
       "psychic",
+      "ice",
       "dark"
     ],
     "dark": [
@@ -260,152 +285,129 @@
       "poison",
       "ground",
       "rock",
-      "steel",
-      "fire",
-      "water",
-      "grass",
-      "electric",
-      "ice",
-      "dragon"
-    ],
-    "ghost": [
-      "flying",
-      "ground",
-      "rock",
-      "steel",
-      "fire",
-      "water",
-      "grass",
-      "electric",
-      "psychic",
-      "ice",
-      "dragon"
-    ],
-    "rock": [
-      "rock",
       "bug",
-      "ghost",
-      "electric",
-      "psychic",
-      "ice",
-      "dragon",
-      "dark"
-    ],
-    "steel": [
+      "fire",
       "water",
-      "electric"
+      "grass",
+      "electric",
+      "ice",
+      "dragon"
     ]
   },
   "type_to_not_effective": {
-    "rock": [
-      "normal",
+    "normal": [
+      "rock",
+      "steel"
+    ],
+    "fighting": [
       "flying",
       "poison",
-      "fire"
-    ],
-    "steel": [
-      "normal",
-      "flying",
-      "rock",
       "bug",
-      "ghost",
-      "steel",
-      "grass",
-      "psychic",
-      "ice",
-      "dragon",
-      "dark"
+      "psychic"
     ],
     "flying": [
-      "fighting",
+      "rock",
+      "steel",
+      "electric"
+    ],
+    "poison": [
+      "poison",
+      "ground",
+      "rock",
+      "ghost"
+    ],
+    "ground": [
       "bug",
       "grass"
     ],
-    "poison": [
+    "rock": [
       "fighting",
-      "poison",
-      "bug",
-      "grass"
+      "ground",
+      "steel"
     ],
     "bug": [
       "fighting",
-      "ground",
-      "grass"
-    ],
-    "psychic": [
-      "fighting",
-      "psychic"
-    ],
-    "electric": [
       "flying",
-      "steel",
-      "electric"
-    ],
-    "ground": [
       "poison",
-      "rock"
+      "ghost",
+      "steel",
+      "fire"
     ],
     "ghost": [
-      "poison",
-      "bug"
-    ],
-    "grass": [
-      "ground",
-      "water",
-      "grass",
-      "electric"
-    ],
-    "fighting": [
-      "rock",
-      "bug",
+      "steel",
       "dark"
     ],
+    "steel": [
+      "steel",
+      "fire",
+      "water",
+      "electric"
+    ],
     "fire": [
+      "rock",
+      "fire",
+      "water",
+      "dragon"
+    ],
+    "water": [
+      "water",
+      "grass",
+      "dragon"
+    ],
+    "grass": [
+      "flying",
+      "poison",
       "bug",
       "steel",
       "fire",
       "grass",
-      "ice"
+      "dragon"
     ],
-    "dark": [
-      "ghost",
-      "dark"
+    "electric": [
+      "grass",
+      "electric",
+      "dragon"
     ],
-    "water": [
+    "psychic": [
+      "steel",
+      "psychic"
+    ],
+    "ice": [
       "steel",
       "fire",
       "water",
       "ice"
     ],
     "dragon": [
-      "fire",
-      "water",
-      "grass",
-      "electric"
+      "steel"
     ],
-    "ice": [
-      "ice"
+    "dark": [
+      "fighting",
+      "steel",
+      "dark"
     ]
   },
   "type_to_no_effect": {
-    "ghost": [
-      "normal",
-      "fighting"
-    ],
-    "steel": [
-      "poison"
-    ],
-    "flying": [
-      "ground"
-    ],
     "normal": [
       "ghost"
     ],
-    "ground": [
-      "electric"
+    "fighting": [
+      "ghost"
     ],
-    "dark": [
-      "psychic"
+    "poison": [
+      "steel"
+    ],
+    "ground": [
+      "flying"
+    ],
+    "ghost": [
+      "normal"
+    ],
+    "electric": [
+      "ground"
+    ],
+    "psychic": [
+      "dark"
     ]
   }
 }

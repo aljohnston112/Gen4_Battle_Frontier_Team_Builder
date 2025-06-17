@@ -6,24 +6,31 @@ from attr import dataclass
 
 from data_class.Category import Category
 from data_class.Move import Move
-from data_class.Pokemon import Pokemon
-from data_class.Stat import StatEnum, get_nature_multiplier, get_nature_enum, \
-    calculate_non_health_stat, calculate_health_stat
+from data_class.Nature import get_nature_multiplier, get_nature_enum
+from data_class.PokemonType import convert_string_to_pokemon_type, PokemonType
+from data_class.SerebiiPokemon import SerebiiPokemon
+from data_class.Stat import StatEnum, calculate_non_health_stat, \
+    calculate_health_stat
 from data_class.Stats import Stats
-from data_source.PokemonDataSource import get_all_pokemon
+from data_source.PokemonDataSource import get_all_serebii_pokemon
 from data_source.PokemonIndexDataSource import get_pokemon_name_to_index
-from data_source.PokemonRankDataSource import get_defense_multipliers_for_types
 from data_source.TrainerSetDataSource import FrontierPokemon
+from data_source.TypeChartDataSource import get_defense_multipliers_for_types
 
 
-@dataclass
+@dataclass(frozen=True)
 class CustomMove:
+    name: str
     power: int
     move_type: str
     is_special: bool
 
+    def __hash__(self):
+        return hash((self.power, self.move_type, self.is_special))
 
-@dataclass
+
+
+@dataclass(frozen=True, hash=False)
 class CustomPokemon:
     name: str
     hp: int
@@ -35,6 +42,40 @@ class CustomPokemon:
     types: list[str]
     moves: list[CustomMove]
     item: str
+
+    def __hash__(self):
+        return hash((self.name))
+
+
+slaking = CustomPokemon(
+    name="Slaking",
+    hp=257,
+    attack=233,
+    special_attack=103,
+    defense=120,
+    special_defense=85,
+    speed=120,
+    types=["normal"],
+    moves=[
+        CustomMove("Giga Impact", 150, "normal", False),
+    ],
+    item="choice band"
+)
+
+metagross = CustomPokemon(
+    name="Metagross",
+    hp=187,
+    attack=205,
+    special_attack=103,
+    defense=150,
+    special_defense=110,
+    speed=90,
+    types=["steel", "psychic"],
+    moves=[
+        CustomMove("Meteor Mash", 100, "steel", False),
+    ],
+    item="choice band"
+)
 
 # Palmer's Pokemon
 
@@ -48,8 +89,8 @@ milotic = CustomPokemon(
     speed=101,
     types=["water"],
     moves=[
-        CustomMove(95, "water", True),  # Surf
-        CustomMove(95, "ice", True),  # Ice Beam
+        CustomMove("Surf", 95, "water", True),
+        CustomMove("Ice Beam", 95, "ice", True),
     ],
     item="shell bell"
 )
@@ -64,9 +105,9 @@ rhyperior = CustomPokemon(
     speed=60,
     types=["ground", "rock"],
     moves=[
-        CustomMove(100, "ground", False),  # Earthquake
-        CustomMove(80, "dark", False),  # Crunch
-        CustomMove(150, "rock", False),  # Rock Wrecker
+        CustomMove("Earthquake", 100, "ground", False),
+        CustomMove("Crunch", 80, "dark", False),
+        CustomMove("Rock Wrecker", 150, "rock", False),
     ],
     item="focus band"
 )
@@ -81,8 +122,8 @@ dragonite = CustomPokemon(
     speed=100,
     types=["dragon", "flying"],
     moves=[
-        CustomMove(80, "dragon", False),  # Dragon Claw
-        CustomMove(60, "flying", False),  # Aerial Ace
+        CustomMove("Dragon Claw", 80, "dragon", False),
+        CustomMove("Aerial Ace", 60, "flying", False),
     ],
     item="lum berry"
 )
@@ -97,10 +138,10 @@ regigigas = CustomPokemon(
     speed=120,
     types=["normal"],
     moves=[
-        CustomMove(121, "normal", False),  # Crush Grip
-        CustomMove(100, "ground", False),  # Earthquake
-        CustomMove(100, "rock", False),  # Stone Edge
-        CustomMove(75, "fighting", False),  # Drain Punch
+        CustomMove("Crush Grip", 121, "normal", False),
+        CustomMove("Earthquake", 100, "ground", False),
+        CustomMove("Stone Edge", 100, "rock", False),
+        CustomMove("Drain Punch", 75, "fighting", False),
     ],
     item="brightpowder"
 )
@@ -115,10 +156,10 @@ heatran = CustomPokemon(
     speed=87,
     types=["fire", "steel"],
     moves=[
-        CustomMove(100, "fire", True),  # Magma Storm
-        CustomMove(80, "steel", True),  # Flash Cannon
-        CustomMove(90, "ground", True),  # Earth Power
-        CustomMove(250, "normal", False),  # Explosion
+        CustomMove("Magma Storm", 100, "fire", True),
+        CustomMove("Flash Cannon", 80, "steel", True),
+        CustomMove("Earth Power", 90, "ground", True),
+        CustomMove("Explosion", 250, "normal", False),
     ],
     item="focus sash"
 )
@@ -133,9 +174,9 @@ cresselia = CustomPokemon(
     speed=105,
     types=["psychic"],
     moves=[
-        CustomMove(90, "psychic", True),  # Psychic
-        CustomMove(90, "ice", True),  # Ice Beam
-        CustomMove(75, "bug", True),  # Signal Beam
+        CustomMove("Psychic", 90, "psychic", True),
+        CustomMove("Ice Beam", 90, "ice", True),
+        CustomMove("Signal Beam", 75, "bug", True),
     ],
     item="leftovers"
 )
@@ -152,7 +193,7 @@ abomasnow = CustomPokemon(
     speed=102,
     types=["grass", "ice"],
     moves=[
-        CustomMove(120, "grass", False),  # Wood Hammer
+        CustomMove("Wood Hammer", 120, "grass", False),
     ],
     item=""
 )
@@ -167,7 +208,7 @@ torterra = CustomPokemon(
     speed=102,
     types=["grass", "ground"],
     moves=[
-        CustomMove(120, "grass", False),  # Wood Hammer
+        CustomMove("Wood Hammer", 120, "grass", False),
     ],
     item=""
 )
@@ -182,7 +223,8 @@ exeggutor = CustomPokemon(
     speed=102,
     types=["grass", "psychic"],
     moves=[
-        CustomMove(math.floor(120 * 1.2), "grass", False),  # Wood Hammer + Miracle Seed
+        CustomMove("Wood Hammer", math.floor(120 * 1.2), "grass", False),
+        # Wood Hammer + Miracle Seed
     ],
     item="miracle seed"
 )
@@ -197,7 +239,8 @@ electivire = CustomPokemon(
     speed=102,
     types=["electric"],
     moves=[
-        CustomMove(math.floor(75 * 1.5), "electric", False),  # Thunder Punch + Life Orb
+        CustomMove("Thunder Punch", math.floor(75 * 1.5), "electric", False),
+        # Thunder Punch + Life Orb
     ],
     item="life orb"
 )
@@ -212,7 +255,8 @@ victreebel = CustomPokemon(
     speed=102,
     types=["grass", "poison"],
     moves=[
-        CustomMove(math.floor(90 * 1.2), "grass", False),  # Leaf Blade + Miracle Seed
+        CustomMove("Leaf Blade", math.floor(90 * 1.2), "grass", False),
+        # Leaf Blade + Miracle Seed
     ],
     item="miracle seed"
 )
@@ -227,7 +271,8 @@ breloom = CustomPokemon(
     speed=102,
     types=["grass", "fighting"],
     moves=[
-        CustomMove(math.floor(80 * 1.2), "grass", False),  # Seed Bomb + Miracle Seed
+        CustomMove("Seed Bomb", math.floor(80 * 1.2), "grass", False),
+        # Seed Bomb + Miracle Seed
     ],
     item="miracle seed"
 )
@@ -242,10 +287,12 @@ leafeon = CustomPokemon(
     speed=102,
     types=["grass"],
     moves=[
-        CustomMove(math.floor(80 * 1.5), "grass", False),  # Seed Bomb + Life Orb
+        CustomMove("Seed Bomb", math.floor(80 * 1.5), "grass", False),
+        # Seed Bomb + Life Orb
     ],
     item="life orb"
 )
+
 
 def intersect_attack_results(
         *results_lists: list[tuple[str, float, str]]
@@ -307,18 +354,21 @@ def find_best_attack_against_target(
     o_defense: int = opponent.defense
     o_special_defense: int = opponent.special_defense
     o_types: frozenset[str] = frozenset(t.lower() for t in opponent.types)
-    o_type_multipliers: dict[str, float] = \
+    o_type_multipliers: dict[PokemonType, float] = \
         get_defense_multipliers_for_types(o_types)
 
     results: dict[str, tuple[str, float]] = {}
     for pokemon in all_pokemon.values():
-        pokemon: Pokemon
+        pokemon: SerebiiPokemon
         min_stats: Stats = pokemon.all_stats.level_50_min_stats
         attack: int = min_stats.attack
         special_attack: int = min_stats.special_attack
 
         best_hits: float = inf
         best_move: str | None = None
+
+        pokemon_types: list[PokemonType] = \
+            pokemon.pokemon_information.pokemon_types
 
         for move in get_all_attacks(pokemon, 50):
             move: Move
@@ -336,16 +386,14 @@ def find_best_attack_against_target(
             if move.power == 0:
                 continue
 
-            move_type: str = move.move_type.name.lower()
-            multiplier: float = o_type_multipliers[move_type]
+            move_type: PokemonType = move.move_type
+            multiplier: float = \
+                o_type_multipliers[move_type]
             power: int = move.power
             is_special: bool = move.category.name.lower() == "special"
             attack_stat: int = special_attack if is_special else attack
             defense_stat: int = o_special_defense if is_special else o_defense
-            is_stab: bool = move_type in [
-                t.name.lower()
-                for t in pokemon.pokemon_information.pokemon_types
-            ]
+            is_stab: bool = move_type in pokemon_types
 
             damage: int = calculate_gen4_damage(
                 level=50,
@@ -437,7 +485,7 @@ def intersect_survivability(*results_lists):
 
 
 def calculate_survivability(
-        pokemon_map: dict[str, Pokemon],
+        pokemon_map: dict[int, SerebiiPokemon],
         opponent: CustomPokemon,
 ) -> dict[str, float]:
     results: dict[str, float] = {}
@@ -447,16 +495,17 @@ def calculate_survivability(
     o_types: set[str] = set(t.lower() for t in opponent.types)
 
     for pokemon in pokemon_map.values():
-        pokemon: Pokemon
-        min_stats: Stats = pokemon.all_stats.level_50_min_stats
+        pokemon: SerebiiPokemon
+        min_stats: Stats = pokemon.all_stats.level_50_max_stats
         hp: int = min_stats.health
         defender_defense: int = min_stats.defense
         defender_special_defense: int = min_stats.special_defense
 
         defender_type_set: frozenset[str] = frozenset(
-            t.name.lower() for t in pokemon.pokemon_information.pokemon_types
+            t.name.lower()
+            for t in pokemon.pokemon_information.pokemon_types
         )
-        defender_type_multipliers: dict[str, float] = \
+        defender_type_multipliers: dict[PokemonType, float] = \
             get_defense_multipliers_for_types(defender_type_set)
 
         # Calculate hits to survive for each move
@@ -466,7 +515,10 @@ def calculate_survivability(
             power: int = move.power
             move_type: str = move.move_type
             is_special: bool = move.is_special
-            multiplier: float = defender_type_multipliers.get(move_type, 1.0)
+            multiplier: float = defender_type_multipliers.get(
+                convert_string_to_pokemon_type(move_type),
+                1.0
+            )
             is_stab: bool = move_type in o_types
 
             # Choose relevant defense stat
@@ -516,7 +568,7 @@ class BattleResult:
 
 
 def combine_survivability_with_attack_results(
-        survive_results: dict[str,float],
+        survive_results: dict[str, float],
         attack_results: dict[str, tuple[str, float]]
 ):
     results: dict[str, BattleResult] = {}
@@ -530,31 +582,32 @@ def combine_survivability_with_attack_results(
             hits_given=attack_result[1],
             move=attack_result[0],
         )
-    return dict(sorted(results.items(), key=lambda x: x[1].hits_given / x[1].hits_taken))
+    return dict(sorted(results.items(),
+                       key=lambda x: x[1].hits_given / x[1].hits_taken))
 
 
 def print_battle_results_against(p1, p2, p3, pokemon_map):
-    # survive_results1:dict[str, float] = calculate_survivability(pokemon_map, p1)
-    # attack_results1: dict[str, tuple[str, float]] = \
-    #     find_best_attack_against_target(pokemon_map, p1)
-    # battle_results_1 = combine_survivability_with_attack_results(
-    #     survive_results1,
-    #     attack_results1
-    # )
-    # battle_results_1 = dict({k: v for k, v, in battle_results_1.items() if v.hits_given < 2.3})
-    # # pprint.pp(battle_results_1)
-    #
+    survive_results1:dict[str, float] = calculate_survivability(pokemon_map, p1)
+    attack_results1: dict[str, tuple[str, float]] = \
+        find_best_attack_against_target(pokemon_map, p1)
+    battle_results_1 = combine_survivability_with_attack_results(
+        survive_results1,
+        attack_results1
+    )
+    battle_results_1 = dict({k: v for k, v, in battle_results_1.items() if v.hits_given < 2.3})
+    pprint.pp(battle_results_1)
+
     survive_results2 = calculate_survivability(pokemon_map, p2)
     attack_results2 = find_best_attack_against_target(pokemon_map, p2)
     battle_results_2 = combine_survivability_with_attack_results(
         survive_results2,
         attack_results2
     )
-    battle_results_2 = dict({k: v for k, v, in battle_results_2.items() if v.hits_given < (2.3 * 2 / 1.5)})
+    battle_results_2 = dict({k: v for k, v, in battle_results_2.items() if
+                             v.hits_given < 2.3})
     pprint.pp(battle_results_2)
     # for name, survivability in battle_results_2.items():
     #     print(f"{name}")
-
 
     survive_results3 = calculate_survivability(pokemon_map, p3)
     attack_results3 = find_best_attack_against_target(pokemon_map, p3)
@@ -562,7 +615,8 @@ def print_battle_results_against(p1, p2, p3, pokemon_map):
         survive_results3,
         attack_results3
     )
-    battle_results_3 = dict({k: v for k, v, in battle_results_3.items() if v.hits_given < 2.3 * 2})
+    battle_results_3 = dict(
+        {k: v for k, v, in battle_results_3.items() if v.hits_given < 2.3 * 2})
     # pprint.pp(battle_results_3)
     # for name, survivability in battle_results_3.items():
     #     print(f"{name}")
@@ -602,8 +656,8 @@ def print_battle_results_against(p1, p2, p3, pokemon_map):
 
 
 def print_battle_results_against_palmer_1(pokemon_map):
-    p1 = milotic
-    p2 = rhyperior
+    p1 = slaking
+    p2 = metagross
     p3 = dragonite
     print_battle_results_against(p1, p2, p3, pokemon_map)
 
@@ -619,13 +673,14 @@ pokemon_to_index = get_pokemon_name_to_index()
 
 
 def convert_frontier_to_custom(
-        pokemon_map: dict[int, Pokemon],
+        pokemon_map: dict[int, SerebiiPokemon],
         set_number: int,
         frontier: FrontierPokemon,
         level: int
 ) -> CustomPokemon:
     custom_moves = [
         CustomMove(
+            name=move.name,
             power=move.power,
             move_type=move.move_type.name.lower(),
             is_special=(move.category == Category.SPECIAL),
@@ -633,7 +688,7 @@ def convert_frontier_to_custom(
         for move in frontier.moves
     ]
 
-    pokemon: Pokemon = pokemon_map[pokemon_to_index[frontier.name]]
+    pokemon: SerebiiPokemon = pokemon_map[pokemon_to_index[frontier.name]]
     base_stats = pokemon.all_stats.base_stats.stats
     iv = (set_number + 1) * 3
     iv = min(iv, 31)
@@ -719,7 +774,7 @@ def convert_frontier_to_custom(
 
 
 def main():
-    pokemon_map = get_all_pokemon()
+    pokemon_map = get_all_serebii_pokemon()
     pokemon_map = filter_banned_pokemon(pokemon_map)
 
     print_battle_results_against_palmer_1(pokemon_map)

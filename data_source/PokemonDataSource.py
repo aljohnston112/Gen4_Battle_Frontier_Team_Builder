@@ -1,32 +1,30 @@
 import json
-import os
 import pprint
 import random
 import time
 import urllib.request
 from collections import defaultdict
 from os.path import exists
-from typing import Dict
 
 import cattr
 from bs4 import BeautifulSoup
 
-from Config import POKEMON_FILE
+from Config import SEREBII_POKEMON_FILE
 from data_class.AllStats import AllStats
-from data_class.Move import Move
 from data_class.BaseStats import BaseStats
 from data_class.Category import convert_to_attack_category
-from data_class.Pokemon import Pokemon
+from data_class.Move import Move
 from data_class.PokemonInformation import PokemonInformation
-from data_class.PokemonType import convert_to_pokemon_type
+from data_class.PokemonType import convert_string_to_pokemon_type
+from data_class.SerebiiPokemon import SerebiiPokemon
 from data_class.Stats import Stats
 
-base_url = "https://www.serebii.net/pokedex-dp/"
-num_pokemon = 493
+__BASE_URL__: str = "https://www.serebii.net/pokedex-dp/"
+__NUM_POKEMON__: int = 493
 
 
-def get_url(index: int):
-    return base_url + str(index).zfill(3) + ".shtml"
+def get_url(index: int) -> str:
+    return __BASE_URL__ + str(index).zfill(3) + ".shtml"
 
 
 def get_general_information(dextable):
@@ -34,29 +32,36 @@ def get_general_information(dextable):
     assert rows[0].text == "\nName\nJp. Name\nNo.\nGender Ratio\nType\n"
     columns = rows[1].text.strip().split("\n")
     name = columns[0].strip()
-    national_id = int(columns[2].strip().split("Johto")[0].split("Sinnoh")[0].split("#")[1])
+    national_id = int(
+        columns[2].strip().split("Johto")[0].split("Sinnoh")[0].split("#")[1])
     pokemon_types = []
     type_image_links = rows[1].find_all("a")
     for type_image_link in type_image_links:
         type_name = type_image_link['href'].strip().split('/')[2].split('.')[0]
-        pokemon_types.append(convert_to_pokemon_type(type_name))
-    if rows[5].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
+        pokemon_types.append(convert_string_to_pokemon_type(type_name))
+    if rows[
+        5].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
         ability_index = 3
         weight_index = 6
-    elif rows[6].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
+    elif rows[
+        6].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
         ability_index = 4
         weight_index = 7
-    elif rows[7].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
+    elif rows[
+        7].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
         ability_index = 6
         weight_index = 9
-    elif rows[8].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
+    elif rows[
+        8].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
         ability_index = 7
         weight_index = 10
-    elif rows[9].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
+    elif rows[
+        9].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n":
         ability_index = 7
         weight_index = 10
     else:
-        assert rows[11].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n"
+        assert rows[
+                   11].text == "\nClassification\nHeight\nWeight\nCapture Rate\nBase Egg Steps\n"
         ability_index = 9
         weight_index = 12
     if "Ability" not in rows[ability_index].text:
@@ -67,7 +72,9 @@ def get_general_information(dextable):
     if "lbs" not in rows[weight_index].text:
         weight_index -= 1
         assert "Ability" in rows[ability_index].text
-    pounds = float(rows[weight_index].text.strip().split("\n")[2].split("lbs")[0].replace(",", ""))
+    pounds = float(
+        rows[weight_index].text.strip().split("\n")[2].split("lbs")[0].replace(
+            ",", ""))
     return PokemonInformation(
         name=name,
         pokemon_types=pokemon_types,
@@ -80,7 +87,8 @@ def get_general_information(dextable):
 def get_level_up_attacks(dextable):
     level_to_attacks = defaultdict(lambda: [])
     rows = [row for row in dextable.find_all("tr")]
-    assert rows[0].text == "Diamond/Pearl/Platinum/HeartGold/SoulSilver Level Up" or \
+    assert rows[
+               0].text == "Diamond/Pearl/Platinum/HeartGold/SoulSilver Level Up" or \
            rows[0].text == 'Platinum/HeartGold/SoulSilver Level Up' or \
            rows[0].text == 'Diamond/Pearl/Platinum Level Up' or \
            rows[0].text == 'Diamond/Pearl Level Up (Attack Form)' or \
@@ -88,7 +96,8 @@ def get_level_up_attacks(dextable):
            rows[0].text == "Diamond/Pearl Level Up (Speed Form)" or \
            rows[0].text == "Diamond/Pearl Level Up (Sandy Cloak)" or \
            rows[0].text == "Diamond/Pearl Level Up (Trash Cloak)" or \
-           rows[0].text == 'Diamond/Pearl/Platinum/HeartGold/SoulSilver Level Up (All  Forms)' or \
+           rows[
+               0].text == 'Diamond/Pearl/Platinum/HeartGold/SoulSilver Level Up (All  Forms)' or \
            rows[0].text == 'Sky Forme Level Up'
     assert rows[1].text == 'LevelAttack NameTypeCat.Att.Acc.PPEffect %'
     current_index = 2
@@ -101,10 +110,12 @@ def get_level_up_attacks(dextable):
         name = columns[1].text
         type_images = columns[2].find_all("img")
         assert len(type_images) == 1
-        pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[
+            0].strip()
         category_images = columns[3].find_all("img")
         assert len(category_images) == 1
-        category = category_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        category = category_images[0]['src'].split("/")[-1].split(".")[
+            0].strip()
         power = columns[4].text
         if power == "--" or \
                 name == "Endeavor" or \
@@ -158,7 +169,7 @@ def get_level_up_attacks(dextable):
         level_to_attacks[level].append(
             Move(
                 name=name,
-                pokemon_type=convert_to_pokemon_type(pokemon_type),
+                move_type=convert_string_to_pokemon_type(pokemon_type),
                 category=convert_to_attack_category(category),
                 power=power,
                 accuracy=accuracy,
@@ -181,10 +192,12 @@ def get_tm_and_hm_attacks(dextable):
         name = columns[1].text.strip()
         type_images = columns[2].find_all("img")
         assert len(type_images) == 1
-        pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[
+            0].strip()
         category_images = columns[3].find_all("img")
         assert len(category_images) == 1
-        category = category_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        category = category_images[0]['src'].split("/")[-1].split(".")[
+            0].strip()
         power = columns[4].text
         if power == "--":
             power = 0
@@ -211,7 +224,7 @@ def get_tm_and_hm_attacks(dextable):
         effect_chance = int(effect_chance)
         tm_or_hm_to_attack[tm_or_hm] = Move(
             name=name,
-            pokemon_type=convert_to_pokemon_type(pokemon_type),
+            move_type=convert_string_to_pokemon_type(pokemon_type),
             category=convert_to_attack_category(category),
             power=power,
             accuracy=accuracy,
@@ -237,10 +250,12 @@ def get_attacks(dextable):
             return None
         type_images = columns[1].find_all("img")
         assert len(type_images) == 1
-        pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[
+            0].strip()
         category_images = columns[2].find_all("img")
         assert len(category_images) == 1
-        category = category_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        category = category_images[0]['src'].split("/")[-1].split(".")[
+            0].strip()
         power = columns[3].text
         if power == "--" or \
                 name == "Belly Drum" or \
@@ -286,7 +301,7 @@ def get_attacks(dextable):
         attacks.append(
             Move(
                 name=name,
-                pokemon_type=convert_to_pokemon_type(pokemon_type),
+                move_type=convert_string_to_pokemon_type(pokemon_type),
                 category=convert_to_attack_category(category),
                 power=power,
                 accuracy=accuracy,
@@ -308,10 +323,12 @@ def get_third_gen_moves(dextable):
         name = columns[0].text.strip()
         type_images = columns[1].find_all("img")
         assert len(type_images) == 1
-        pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[
+            0].strip()
         category_images = columns[2].find_all("img")
         assert len(category_images) == 1
-        category = category_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        category = category_images[0]['src'].split("/")[-1].split(".")[
+            0].strip()
         power = columns[3].text
         if power == "--":
             power = 0
@@ -338,7 +355,7 @@ def get_third_gen_moves(dextable):
             attack = (
                 Move(
                     name=name,
-                    pokemon_type=convert_to_pokemon_type(pokemon_type),
+                    move_type=convert_string_to_pokemon_type(pokemon_type),
                     category=convert_to_attack_category(category),
                     power=power,
                     accuracy=accuracy,
@@ -368,10 +385,12 @@ def get_forms_move_tutor_attacks(dextable):
         name = columns[0].text.strip()
         type_images = columns[1].find_all("img")
         assert len(type_images) == 1
-        pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[
+            0].strip()
         category_images = columns[2].find_all("img")
         assert len(category_images) == 1
-        category = category_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        category = category_images[0]['src'].split("/")[-1].split(".")[
+            0].strip()
         power = columns[3].text
         if power == "--" or name == "Endeavor":
             power = 0
@@ -398,7 +417,7 @@ def get_forms_move_tutor_attacks(dextable):
             attack = (
                 Move(
                     name=name,
-                    pokemon_type=convert_to_pokemon_type(pokemon_type),
+                    move_type=convert_string_to_pokemon_type(pokemon_type),
                     category=convert_to_attack_category(category),
                     power=power,
                     accuracy=accuracy,
@@ -425,7 +444,8 @@ def get_stats(dextable, name):
            rows[0].text == '\nStats - Alternate Forms' or \
            rows[0].text == '\nStats - Origin Forme' or \
            rows[0].text == '\nStats - Sky Forme'
-    assert rows[1].text.strip() == 'HP\nAttack\nDefense\nSp. Attack\nSp. Defense\nSpeed'
+    assert rows[
+               1].text.strip() == 'HP\nAttack\nDefense\nSp. Attack\nSp. Defense\nSpeed'
     base_stat_tokens = rows[2].text.split("\n")
     assert len(base_stat_tokens) == 7
     base_hp = int(base_stat_tokens[1])
@@ -447,12 +467,18 @@ def get_stats(dextable, name):
         )
     )
     max_stats_hindering_nature_tokens = rows[3].text.split("\n")
-    level_50_min_hp_stat = int(max_stats_hindering_nature_tokens[2].split("-")[0].strip())
-    level_50_min_attack_stat = int(max_stats_hindering_nature_tokens[3].split("-")[0].strip())
-    level_50_min_defense_stat = int(max_stats_hindering_nature_tokens[4].split("-")[0].strip())
-    level_50_min_special_attack_stat = int(max_stats_hindering_nature_tokens[5].split("-")[0].strip())
-    level_50_min_special_defense_stat = int(max_stats_hindering_nature_tokens[6].split("-")[0].strip())
-    level_50_min_speed_stat = int(max_stats_hindering_nature_tokens[7].split("-")[0].strip())
+    level_50_min_hp_stat = int(
+        max_stats_hindering_nature_tokens[2].split("-")[0].strip())
+    level_50_min_attack_stat = int(
+        max_stats_hindering_nature_tokens[3].split("-")[0].strip())
+    level_50_min_defense_stat = int(
+        max_stats_hindering_nature_tokens[4].split("-")[0].strip())
+    level_50_min_special_attack_stat = int(
+        max_stats_hindering_nature_tokens[5].split("-")[0].strip())
+    level_50_min_special_defense_stat = int(
+        max_stats_hindering_nature_tokens[6].split("-")[0].strip())
+    level_50_min_speed_stat = int(
+        max_stats_hindering_nature_tokens[7].split("-")[0].strip())
     level_50_min_stats = Stats(
         name=name,
         health=level_50_min_hp_stat,
@@ -464,12 +490,18 @@ def get_stats(dextable, name):
     )
 
     max_stats_hindering_nature_tokens = rows[4].text.split("\n")
-    level_100_min_hp_stat = int(max_stats_hindering_nature_tokens[1].split("-")[0].strip())
-    level_100_min_attack_stat = int(max_stats_hindering_nature_tokens[2].split("-")[0].strip())
-    level_100_min_defense_stat = int(max_stats_hindering_nature_tokens[3].split("-")[0].strip())
-    level_100_min_special_attack_stat = int(max_stats_hindering_nature_tokens[4].split("-")[0].strip())
-    level_100_min_special_defense_stat = int(max_stats_hindering_nature_tokens[5].split("-")[0].strip())
-    level_100_min_speed_stat = int(max_stats_hindering_nature_tokens[6].split("-")[0].strip())
+    level_100_min_hp_stat = int(
+        max_stats_hindering_nature_tokens[1].split("-")[0].strip())
+    level_100_min_attack_stat = int(
+        max_stats_hindering_nature_tokens[2].split("-")[0].strip())
+    level_100_min_defense_stat = int(
+        max_stats_hindering_nature_tokens[3].split("-")[0].strip())
+    level_100_min_special_attack_stat = int(
+        max_stats_hindering_nature_tokens[4].split("-")[0].strip())
+    level_100_min_special_defense_stat = int(
+        max_stats_hindering_nature_tokens[5].split("-")[0].strip())
+    level_100_min_speed_stat = int(
+        max_stats_hindering_nature_tokens[6].split("-")[0].strip())
     level_100_min_stats = Stats(
         name=name,
         health=level_100_min_hp_stat,
@@ -481,12 +513,18 @@ def get_stats(dextable, name):
     )
 
     max_stats_beneficial_nature_tokens = rows[7].text.split("\n")
-    level_50_max_hp_stat = int(max_stats_beneficial_nature_tokens[2].split("-")[1].strip())
-    level_50_max_attack_stat = int(max_stats_beneficial_nature_tokens[3].split("-")[1].strip())
-    level_50_max_defense_stat = int(max_stats_beneficial_nature_tokens[4].split("-")[1].strip())
-    level_50_max_special_attack_stat = int(max_stats_beneficial_nature_tokens[5].split("-")[1].strip())
-    level_50_max_special_defense_stat = int(max_stats_beneficial_nature_tokens[6].split("-")[1].strip())
-    level_50_max_speed_stat = int(max_stats_beneficial_nature_tokens[7].split("-")[1].strip())
+    level_50_max_hp_stat = int(
+        max_stats_beneficial_nature_tokens[2].split("-")[1].strip())
+    level_50_max_attack_stat = int(
+        max_stats_beneficial_nature_tokens[3].split("-")[1].strip())
+    level_50_max_defense_stat = int(
+        max_stats_beneficial_nature_tokens[4].split("-")[1].strip())
+    level_50_max_special_attack_stat = int(
+        max_stats_beneficial_nature_tokens[5].split("-")[1].strip())
+    level_50_max_special_defense_stat = int(
+        max_stats_beneficial_nature_tokens[6].split("-")[1].strip())
+    level_50_max_speed_stat = int(
+        max_stats_beneficial_nature_tokens[7].split("-")[1].strip())
     level_50_max_stats = Stats(
         name=name,
         health=level_50_max_hp_stat,
@@ -498,12 +536,18 @@ def get_stats(dextable, name):
     )
 
     max_stats_beneficial_nature_tokens = rows[8].text.split("\n")
-    level_100_max_hp_stat = int(max_stats_beneficial_nature_tokens[1].split("-")[1].strip())
-    level_100_max_attack_stat = int(max_stats_beneficial_nature_tokens[2].split("-")[1].strip())
-    level_100_max_defense_stat = int(max_stats_beneficial_nature_tokens[3].split("-")[1].strip())
-    level_100_max_special_attack_stat = int(max_stats_beneficial_nature_tokens[4].split("-")[1].strip())
-    level_100_max_special_defense_stat = int(max_stats_beneficial_nature_tokens[5].split("-")[1].strip())
-    level_100_max_speed_stat = int(max_stats_beneficial_nature_tokens[6].split("-")[1].strip())
+    level_100_max_hp_stat = int(
+        max_stats_beneficial_nature_tokens[1].split("-")[1].strip())
+    level_100_max_attack_stat = int(
+        max_stats_beneficial_nature_tokens[2].split("-")[1].strip())
+    level_100_max_defense_stat = int(
+        max_stats_beneficial_nature_tokens[3].split("-")[1].strip())
+    level_100_max_special_attack_stat = int(
+        max_stats_beneficial_nature_tokens[4].split("-")[1].strip())
+    level_100_max_special_defense_stat = int(
+        max_stats_beneficial_nature_tokens[5].split("-")[1].strip())
+    level_100_max_speed_stat = int(
+        max_stats_beneficial_nature_tokens[6].split("-")[1].strip())
     level_100_max_stats = Stats(
         name=name,
         health=level_100_max_hp_stat,
@@ -524,7 +568,8 @@ def get_stats(dextable, name):
 
 
 def get_pre_evolution_moves(dextable):
-    pre_evolution_index_to_level_to_moves = defaultdict(lambda: defaultdict(lambda: list()))
+    pre_evolution_index_to_level_to_moves = defaultdict(
+        lambda: defaultdict(lambda: list()))
     rows = [row for row in dextable.find_all("tr")]
     assert rows[0].text == 'Pre-Evolution Moves'
     assert rows[1].text.strip() == 'Attack NameTypeCat.Att.Acc.PPEffect % Means'
@@ -538,10 +583,12 @@ def get_pre_evolution_moves(dextable):
             name = columns[0].text.strip()
             type_images = columns[1].find_all("img")
             assert len(type_images) == 1
-            pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[0].strip()
+            pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[
+                0].strip()
             category_images = columns[2].find_all("img")
             assert len(category_images) == 1
-            category = category_images[0]['src'].split("/")[-1].split(".")[0].strip()
+            category = category_images[0]['src'].split("/")[-1].split(".")[
+                0].strip()
             power = columns[3].text
             if power == "--" or name == "Endeavor" or name == "Bide" or name == 'Night Shade':
                 power = 0
@@ -569,7 +616,7 @@ def get_pre_evolution_moves(dextable):
             attack = (
                 Move(
                     name=name,
-                    pokemon_type=convert_to_pokemon_type(pokemon_type),
+                    move_type=convert_string_to_pokemon_type(pokemon_type),
                     category=convert_to_attack_category(category),
                     power=power,
                     accuracy=accuracy,
@@ -580,13 +627,15 @@ def get_pre_evolution_moves(dextable):
             columns = rows[current_index].find_all("td")
             pokemon_images = columns[0].find_all("img")
             assert len(pokemon_images) == 1
-            pokemon_index = int(pokemon_images[0]['src'].split("/")[-1].split(".")[0])
+            pokemon_index = int(
+                pokemon_images[0]['src'].split("/")[-1].split(".")[0])
             possible_level = columns[1].text.split(".")
             if len(possible_level) > 1:
                 level = int(possible_level[1].strip())
             else:
                 level = 0
-            pre_evolution_index_to_level_to_moves[pokemon_index][level].append(attack)
+            pre_evolution_index_to_level_to_moves[pokemon_index][level].append(
+                attack)
             current_index += 2
     return pre_evolution_index_to_level_to_moves
 
@@ -603,10 +652,12 @@ def get_tm_and_hm_attacks_for_forms(dextable):
         name = columns[1].text.strip()
         type_images = columns[2].find_all("img")
         assert len(type_images) == 1
-        pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[
+            0].strip()
         category_images = columns[3].find_all("img")
         assert len(category_images) == 1
-        category = category_images[0]['src'].split("/")[-1].split(".")[0].strip()
+        category = category_images[0]['src'].split("/")[-1].split(".")[
+            0].strip()
         power = columns[4].text
         if power == "--":
             power = 0
@@ -635,7 +686,7 @@ def get_tm_and_hm_attacks_for_forms(dextable):
             attack = (
                 Move(
                     name=name,
-                    pokemon_type=convert_to_pokemon_type(pokemon_type),
+                    move_type=convert_string_to_pokemon_type(pokemon_type),
                     category=convert_to_attack_category(category),
                     power=power,
                     accuracy=accuracy,
@@ -651,13 +702,16 @@ def get_tm_and_hm_attacks_for_forms(dextable):
     return form_to_tm_or_hm_to_attacks
 
 
-def __scrape_serebii_for_move_sets__():
-    pokemon_index_to_pokemon = defaultdict(lambda: list())
-    last_url_index = 0
-    for pokemon_index in range(last_url_index + 1, num_pokemon + 1):
-        url = get_url(pokemon_index)
+def __scrape_serebii_for_pokemon_data__():
+    pokemon_index_to_pokemon: dict[int, SerebiiPokemon] = {}
+    last_url_index_downloaded: int = 0
+    for pokemon_index in range(
+            last_url_index_downloaded + 1,
+            __NUM_POKEMON__ + 1
+    ):
+        url: str = get_url(pokemon_index)
         with urllib.request.urlopen(url) as fp:
-            soup = BeautifulSoup(fp, 'html.parser')
+            soup: BeautifulSoup = BeautifulSoup(fp, 'html.parser')
             children = [c for c in soup.children]
             assert len(children) == 4
             html = children[3]
@@ -665,21 +719,21 @@ def __scrape_serebii_for_move_sets__():
             html_children = [c for c in html.children]
             assert len(html_children) == 5
             body = html_children[3]
-            assert body.name == "body"
+            assert body.defender_name == "body"
             body_children = [c for c in body.children]
             assert len(body_children) == 12
             wrapper = body_children[5]
-            assert wrapper.name == "div"
+            assert wrapper.defender_name == "div"
             assert wrapper.attrs['id'] == "wrapper"
             wrapper_children = [c for c in wrapper.children]
             assert len(wrapper_children) == 13
             content = wrapper_children[9]
-            assert content.name == "div"
+            assert content.defender_name == "div"
             assert content.attrs['id'] == "content"
             content_children = [c for c in content.children]
             assert len(content_children) == 4
             main = content_children[3]
-            assert main.name == "main"
+            assert main.defender_name == "main"
             main_children = [c for c in main.children]
             assert len(main_children) == 2
             center = main_children[1]
@@ -756,9 +810,11 @@ def __scrape_serebii_for_move_sets__():
                              pokemon_index == 413 or
                              pokemon_index == 487 or
                              pokemon_index == 492):
-                        form_to_move_tutor_attacks = get_forms_move_tutor_attacks(dextable)
+                        form_to_move_tutor_attacks = get_forms_move_tutor_attacks(
+                            dextable)
                     elif first_row_text == "TM & HM Attacks" and pokemon_index == 413:
-                        form_to_tm_or_hm_to_attack = get_tm_and_hm_attacks_for_forms(dextable)
+                        form_to_tm_or_hm_to_attack = get_tm_and_hm_attacks_for_forms(
+                            dextable)
                     elif first_row_text == "Diamond/Pearl/Platinum/HeartGold/SoulSilver Level Up" or \
                             first_row_text == 'Platinum/HeartGold/SoulSilver Level Up' or \
                             first_row_text == 'Diamond/Pearl/Platinum Level Up' or \
@@ -820,7 +876,8 @@ def __scrape_serebii_for_move_sets__():
                             pokemon_information.name
                         )
                     elif first_row_text == 'Pre-Evolution Moves':
-                        pre_evolution_index_to_level_to_moves = get_pre_evolution_moves(dextable)
+                        pre_evolution_index_to_level_to_moves = get_pre_evolution_moves(
+                            dextable)
                     elif first_row_text == "Special Moves":
                         special_moves = get_attacks(dextable)
                     elif first_row_text == 'Diamond/Pearl Level Up (Attack Form)':
@@ -859,7 +916,8 @@ def __scrape_serebii_for_move_sets__():
                 form_to_all_stats["Trash Cloak"] = all_trash_form_stats
             if all_rotom_alternative_form_stats is not None:
                 form_to_all_stats = dict()
-                form_to_all_stats["Alternate Forms"] = all_rotom_alternative_form_stats
+                form_to_all_stats[
+                    "Alternate Forms"] = all_rotom_alternative_form_stats
             if all_origin_form_stats is not None:
                 form_to_all_stats = dict()
                 form_to_all_stats["Origin Forme"] = all_origin_form_stats
@@ -870,7 +928,7 @@ def __scrape_serebii_for_move_sets__():
             assert pokemon_information is not None
             assert all_stats is not None
             assert level_to_attacks is not None
-            pokemon = Pokemon(
+            pokemon = SerebiiPokemon(
                 pokemon_information=pokemon_information,
                 all_stats=all_stats,
                 form_to_all_stats=form_to_all_stats,
@@ -890,17 +948,26 @@ def __scrape_serebii_for_move_sets__():
     return pokemon_index_to_pokemon
 
 
-def get_all_pokemon() -> Dict[int, Pokemon]:
-    if not exists(POKEMON_FILE):
-        pokemon_index_to_pokemon = __scrape_serebii_for_move_sets__()
-        with open(POKEMON_FILE, "w") as fo:
-            fo.write(json.dumps(cattr.unstructure(pokemon_index_to_pokemon)))
-    else:
-        with open(POKEMON_FILE, "r") as fo:
-            pokemon_index_to_pokemon = cattr.structure(json.loads(fo.read()), Dict[str, Pokemon])
+def get_all_serebii_pokemon() -> dict[int, SerebiiPokemon]:
+    if not exists(SEREBII_POKEMON_FILE):
+        pokemon_index_to_pokemon: dict[int, SerebiiPokemon] = \
+            __scrape_serebii_for_pokemon_data__()
+        with open(SEREBII_POKEMON_FILE, "w") as fo:
+            fo.write(
+                json.dumps(
+                    cattr.unstructure(pokemon_index_to_pokemon),
+                    indent=4
+                )
+            )
+    with open(SEREBII_POKEMON_FILE, "r") as fo:
+        pokemon_index_to_pokemon = cattr.structure(
+            json.loads(fo.read()),
+            dict[str, SerebiiPokemon]
+        )
     return pokemon_index_to_pokemon
 
 
 if __name__ == "__main__":
-    pokemon_index_to_pokemon = get_all_pokemon()
-    pprint.pp(pokemon_index_to_pokemon)
+    g_pokemon_index_to_pokemon: dict[int, SerebiiPokemon] = \
+        get_all_serebii_pokemon()
+    pprint.pp(g_pokemon_index_to_pokemon)
