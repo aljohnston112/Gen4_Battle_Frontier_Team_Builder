@@ -9,7 +9,7 @@ from data_class.Move import Move
 from data_class.PokemonType import PokemonType
 from data_class.Stat import Stat, StatEnum
 from data_source.PokemonTypeDataSource import get_pokemon_types
-from data_source.move_data_source import get_moves
+from data_source.move_data_source import get_move_map
 
 
 @attr.define
@@ -23,9 +23,6 @@ class FrontierPokemon:
 
     def __hash__(self) -> int:
         return hash(self.name) + hash(tuple(self.moves))
-
-    def __repr__(self) -> str:
-        return self.name
 
 
 def get_next_non_newline(file: typing.IO):
@@ -64,7 +61,7 @@ def get_frontier_pokemon() -> defaultdict[str, tuple[list[int], set[FrontierPoke
     pokemon :defaultdict[str, tuple[set[int], set[FrontierPokemon]]] = defaultdict(lambda: (set(), set()))
     set_to_trainers = __parse_trainers__()
     all_pokemon_types: dict[str, list[PokemonType]] = get_pokemon_types()
-    pokemon_moves = get_moves()
+    pokemon_moves = get_move_map()
 
     with open(TRAINER_SET_LIST, "r", encoding='utf-8') as file:
         s = file.read()
@@ -126,8 +123,9 @@ def get_frontier_pokemon() -> defaultdict[str, tuple[list[int], set[FrontierPoke
 
 
 if __name__ == '__main__':
-    g_set_to_trainer = __parse_trainers__()
-    pprint.pprint(g_set_to_trainer)
+    # g_set_to_trainer = __parse_trainers__()
+    # pprint.pprint(g_set_to_trainer)
 
-    g_set_pokemon__ = get_frontier_pokemon()
+    g_set_pokemon__: defaultdict[str, tuple[list[int], set[FrontierPokemon]]] = \
+        get_frontier_pokemon()
     pprint.pprint(g_set_pokemon__)

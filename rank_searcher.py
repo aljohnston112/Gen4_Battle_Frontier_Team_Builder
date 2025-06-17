@@ -7,9 +7,10 @@ from attr import dataclass
 from data_class.Category import Category
 from data_class.Move import Move
 from data_class.Pokemon import Pokemon
-from data_class.Stat import StatEnum, get_nature_multiplier, get_nature_enum
+from data_class.Stat import StatEnum, get_nature_multiplier, get_nature_enum, \
+    calculate_non_health_stat, calculate_health_stat
 from data_class.Stats import Stats
-from data_source.PokemonDataSource import get_pokemon
+from data_source.PokemonDataSource import get_all_pokemon
 from data_source.PokemonIndexDataSource import get_pokemon_name_to_index
 from data_source.PokemonRankDataSource import get_defense_multipliers_for_types
 from data_source.TrainerSetDataSource import FrontierPokemon
@@ -245,27 +246,6 @@ leafeon = CustomPokemon(
     ],
     item="life orb"
 )
-
-def calculate_health_stat(
-        base: int,
-        iv: int,
-        ev: int,
-        level: int
-) -> int:
-    stat = (((2 * base + iv + (ev // 4)) * level) // 100) + level + 10
-    return stat
-
-
-def calculate_non_health_stat(
-        base: int,
-        iv: int,
-        ev: int,
-        level: int,
-        nature_multiplier: float
-) -> int:
-    stat = ((2 * base + iv + (ev // 4)) * level) // 100 + 5
-    return math.floor(stat * nature_multiplier)
-
 
 def intersect_attack_results(
         *results_lists: list[tuple[str, float, str]]
@@ -656,6 +636,7 @@ def convert_frontier_to_custom(
     pokemon: Pokemon = pokemon_map[pokemon_to_index[frontier.name]]
     base_stats = pokemon.all_stats.base_stats.stats
     iv = (set_number + 1) * 3
+    iv = min(iv, 31)
     hp_ev = next((s.value for s in frontier.effort_values if
                   s.stat_type == StatEnum.HEALTH))
     hp = calculate_health_stat(
@@ -724,6 +705,7 @@ def convert_frontier_to_custom(
     )
 
     return CustomPokemon(
+        name=pokemon.pokemon_information.name,
         hp=hp,
         attack=attack,
         special_attack=special_attack,
@@ -731,12 +713,13 @@ def convert_frontier_to_custom(
         special_defense=special_defense,
         speed=speed,
         types=[t.name.lower() for t in frontier.types],
-        moves=custom_moves
+        moves=custom_moves,
+        item=frontier.item
     )
 
 
 def main():
-    pokemon_map = get_pokemon()
+    pokemon_map = get_all_pokemon()
     pokemon_map = filter_banned_pokemon(pokemon_map)
 
     print_battle_results_against_palmer_1(pokemon_map)

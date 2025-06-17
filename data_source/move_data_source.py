@@ -7,7 +7,7 @@ from Config import MOVES_FILE
 from data_class.Move import Move
 
 
-def get_moves() -> dict[str, Move]:
+def get_move_map() -> dict[str, Move]:
     """
     Gets all the moves from Pokémon Platinum.
     :return: A dictionary of move names to detailed move data.
@@ -21,5 +21,5 @@ def get_moves() -> dict[str, Move]:
 
 
 if __name__ == '__main__':
-    moves = get_moves()
+    moves: dict[str, Move] = get_move_map()
     pprint.pprint(moves)

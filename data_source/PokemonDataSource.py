@@ -890,7 +890,7 @@ def __scrape_serebii_for_move_sets__():
     return pokemon_index_to_pokemon
 
 
-def get_pokemon() -> Dict[int, Pokemon]:
+def get_all_pokemon() -> Dict[int, Pokemon]:
     if not exists(POKEMON_FILE):
         pokemon_index_to_pokemon = __scrape_serebii_for_move_sets__()
         with open(POKEMON_FILE, "w") as fo:
@@ -902,5 +902,5 @@ def get_pokemon() -> Dict[int, Pokemon]:
 
 
 if __name__ == "__main__":
-    pokemon_index_to_pokemon = get_pokemon()
+    pokemon_index_to_pokemon = get_all_pokemon()
     pprint.pp(pokemon_index_to_pokemon)

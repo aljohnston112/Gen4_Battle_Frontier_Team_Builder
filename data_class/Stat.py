@@ -1,3 +1,4 @@
+import math
 from enum import unique, Enum
 
 import attr
@@ -256,3 +257,23 @@ def get_nature_multiplier(stat_type: StatEnum, nature: NatureEnum) -> float:
     return __stat_to_nature_multipliers__\
         .get(stat_type, {})\
         .get(nature, 1.0)
+
+def calculate_health_stat(
+        base: int,
+        iv: int,
+        ev: int,
+        level: int
+) -> int:
+    stat = (((2 * base + iv + (ev // 4)) * level) // 100) + level + 10
+    return stat
+
+
+def calculate_non_health_stat(
+        base: int,
+        iv: int,
+        ev: int,
+        level: int,
+        nature_multiplier: float
+) -> int:
+    stat = ((2 * base + iv + (ev // 4)) * level) // 100 + 5
+    return math.floor(stat * nature_multiplier)
