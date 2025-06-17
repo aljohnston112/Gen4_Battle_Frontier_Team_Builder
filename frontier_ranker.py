@@ -101,13 +101,15 @@ if __name__ == '__main__':
             attack_results
         )
         for name, battle_result in battle_results.items():
-            if name not in aggregated_battle_results:
-                aggregated_battle_results[name] = ()
-            aggregated_battle_results[name] += (battle_results[name],)
+            if battle_result.hits_taken > 1:
+                if name not in aggregated_battle_results:
+                    aggregated_battle_results[name] = ()
+                aggregated_battle_results[name] += (battle_results[name],)
 
     battle_results_sorted = dict(sorted(
         aggregated_battle_results.items(),
-        key=lambda x: sum(br.hits_given / br.hits_taken for br in x[1])
+        key=lambda x: (-len(x[1]), sum(br.hits_given / br.hits_taken for br in x[1]))
     ))
-    pp(aggregated_battle_results)
+
+    pp(battle_results_sorted)
 
