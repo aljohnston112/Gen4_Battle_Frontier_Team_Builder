@@ -26,7 +26,13 @@ class CustomMove:
     is_special: bool
 
     def __hash__(self):
-        return hash((self.power, self.move_type, self.is_special))
+        return hash(self.name)
+
+    def __eq__(self, other):
+        return (
+                isinstance(other, CustomMove)
+                and self.name == other.name
+        )
 
 
 @dataclass(hash=False)
@@ -43,7 +49,18 @@ class CustomPokemon:
     item: str
 
     def __hash__(self):
-        return hash(self.name)
+        return hash((
+            self.name,
+            tuple(sorted([m.name for m in self.moves])),
+        ))
+
+    def __eq__(self, other):
+        return (
+                isinstance(other, FrontierPokemon)
+                and self.name == other.name
+                and sorted(m.name for m in self.moves) == sorted(
+            m.name for m in other.moves)
+        )
 
 
 def get_stat_for_frontier_pokemon(
@@ -97,8 +114,11 @@ def convert_frontier_to_custom(
     pokemon: SerebiiPokemon = pokemon_map[
         pokemon_to_index[frontier_pokemon.name]]
     base_stats = pokemon.all_stats.base_stats
-    iv = (set_number + 1) * 3
-    iv = min(iv, 31)
+    if set_number == 7:
+        iv = 31
+    else:
+        iv = (set_number + 1) * 3
+        iv = min(iv, 31)
     hp = get_stat_for_frontier_pokemon(
         frontier_pokemon=frontier_pokemon,
         base_stats=base_stats,
@@ -177,6 +197,8 @@ def calculate_gen4_damage(
     return damage
 
 
+charge_moves = ["giga impact", "hyper beam", "rock wrecker"]
+
 # TODO Focus Band, King's Rock, Lansat Berry, Lax Incense, Light Clay,
 #  Lucky Punch, Mental Herb, Razor Claw, Razor Fang, Scope Lens, Stick
 #  are not implemented; not sure if there are good ways to implement
@@ -238,6 +260,9 @@ def get_max_damage_attacker_can_do_to_defender(
 ) -> tuple[int, CustomMove | None]:
     move: CustomMove | None = None
     max_damage: int = 0
+
+    charge_move: Move | None = None
+    charge_move_damage: int = 0
 
     attack_stat: int = attacker.attack
     attacker_item = attacker.item
@@ -302,9 +327,16 @@ def get_max_damage_attacker_can_do_to_defender(
                 damage: int = floor(1.2 * damage)
             if attacker_item == "Life Orb":
                 damage: int = floor(1.3 * damage)
-        if damage > max_damage:
-            move: CustomMove = pokemon_move
-        max_damage: int = max(damage, max_damage)
+        if pokemon_move.name.lower() in charge_moves:
+            if damage > charge_move_damage:
+                charge_move: CustomMove = pokemon_move
+            charge_move_damage: int = max(damage, charge_move_damage)
+        else:
+            if damage > max_damage:
+                move: CustomMove = pokemon_move
+            max_damage: int = max(damage, max_damage)
+    if charge_move is not None and charge_move_damage > max_damage * 2:
+        return charge_move_damage, charge_move
     return max_damage, move
 
 
@@ -317,7 +349,7 @@ def convert_to_custom_move(move: Move) -> CustomMove:
     )
 
 
-def get_all_attacks(pokemon) -> list[Move]:
+def get_all_attacks(pokemon: SerebiiPokemon) -> list[Move]:
     attacks = []
 
     for attack_level, attack_list in pokemon.level_to_attacks.items():

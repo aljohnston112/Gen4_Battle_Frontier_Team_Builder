@@ -6,7 +6,7 @@ from attrs import frozen
 
 from damage_calculator import CustomPokemon, CustomMove, IMPLEMENTED_ITEMS, \
     convert_frontier_to_custom, get_max_damage_attacker_can_do_to_defender, \
-    get_all_attacks, bad_moves, convert_to_custom_move
+    get_all_attacks, bad_moves, convert_to_custom_move, charge_moves
 from data_class.FrontierPokemon import FrontierPokemon
 from data_class.PokemonType import PokemonType
 from data_class.SerebiiPokemon import SerebiiPokemon
@@ -32,12 +32,12 @@ class BattleResult:
 @dataclass
 class BattleResults:
     name: str
-    win_results: dict[CustomMove, dict[str, BattleResult]]
-    loss_results: dict[CustomMove, dict[str, BattleResult]]
+    win_results: dict[CustomMove, dict[CustomPokemon, BattleResult]]
+    loss_results: dict[CustomMove, dict[CustomPokemon, BattleResult]]
 
 
 def get_health_gained(
-        pokemon: CustomPokemon,
+        attacking_pokemon: CustomPokemon,
         move: str,
         attack_damage: float,
         was_first: bool,
@@ -50,6 +50,21 @@ def get_health_gained(
     health_gain_before_loss: int = 0
     health_gained: int = 0
     health_lost: int = 0
+
+    if move.lower() in ["explosion", "selfdestruct"]:
+        return -current_health
+
+    recoil: int = 0
+    if move.lower() in [
+        "brave bird", "double-edge", "flare blitz", "volt tackle", "wood hammer"
+    ]:
+        recoil = floor(attack_damage / 3)
+    elif move.lower() in ["head smash"]:
+        recoil = floor(attack_damage / 2)
+    elif move.lower() in ["submission", "take down"]:
+        recoil = floor(attack_damage / 4)
+
+    health_lost += recoil
 
     # Toxic
     if player_turns_badly_poisoned > 0:
@@ -69,15 +84,15 @@ def get_health_gained(
     # Sitrus Berry
     if hold_item == "Sitrus Berry" and current_health < max_health // 2:
         health_gained += max_health // 4
-        pokemon.item = ""
+        attacking_pokemon.item = ""
 
     # Black Sludge
     elif hold_item == "Black Sludge":
-        has_magic_guard: bool = pokemon.name in [
+        has_magic_guard: bool = attacking_pokemon.name in [
             "Clefairy", "Clefable", "Kadabra", "Alakazam"
         ]
         if not has_magic_guard:
-            is_poison: bool = PokemonType.POISON in pokemon.types
+            is_poison: bool = PokemonType.POISON in attacking_pokemon.types
             if is_poison and not is_player:
                 health_gained += max_health // 16
             elif is_player:
@@ -168,10 +183,10 @@ def convert_serebii_to_custom(player_pokemon: SerebiiPokemon) -> CustomPokemon:
     )
 
 
-frontier_pokemon: list[FrontierPokemon] = [
+frontier_pokemon: set[FrontierPokemon] = set([
     p for p in get_all_frontier_pokemon()
-    if 7 in p.set_numbers
-]
+    if 0 in p.set_numbers
+])
 
 
 def get_pokemon_to_pokemon_they_can_beat() -> dict[str, BattleResults]:
@@ -183,9 +198,8 @@ def get_pokemon_to_pokemon_they_can_beat() -> dict[str, BattleResults]:
     # Get the best 4 moves
     winner_to_moves: dict[str, list[CustomMove]] = dict()
     for player_pokemon in pokemon_map.values():
-        player_pokemon: CustomPokemon = convert_serebii_to_custom(
-            player_pokemon
-        )
+        player_pokemon: CustomPokemon = \
+            convert_serebii_to_custom(player_pokemon)
         player_defense_multipliers: dict[PokemonType, float] = \
             get_defense_multipliers_for_types(frozenset(player_pokemon.types))
 
@@ -252,6 +266,8 @@ def get_pokemon_to_pokemon_they_can_beat() -> dict[str, BattleResults]:
 
 
 pokemon_map = get_legal_serebii_pokemon()
+player_random = 1.0
+opponent_random = 1.0
 
 
 def perform_battle_simulation(
@@ -260,10 +276,10 @@ def perform_battle_simulation(
         player_max_health: int,
         player_speed_stat: int,
 ):
-    win_results: dict[CustomMove, dict[str, BattleResult]] = dict()
-    lose_results: dict[CustomMove, dict[str, BattleResult]] = dict()
+    win_results: dict[CustomMove, dict[CustomPokemon, BattleResult]] = dict()
+    lose_results: dict[CustomMove, dict[CustomPokemon, BattleResult]] = dict()
+
     for i, opponent_pokemon in enumerate(frontier_pokemon):
-        set_numbers: str = str("".join([str(s) for s in sorted(opponent_pokemon.set_numbers)]))
         opponent_pokemon: CustomPokemon = convert_frontier_to_custom(
             pokemon_map,
             100,
@@ -289,7 +305,7 @@ def perform_battle_simulation(
             get_max_damage_attacker_can_do_to_defender(
                 attacker=opponent_pokemon,
                 defender=player_pokemon,
-                random=1.0,
+                random=opponent_random,
                 is_poisoned=False,
                 defender_defense_multipliers=player_defense_multipliers
             )
@@ -297,7 +313,7 @@ def perform_battle_simulation(
             get_max_damage_attacker_can_do_to_defender(
                 attacker=player_pokemon,
                 defender=opponent_pokemon,
-                random=0.85,
+                random=player_random,
                 is_poisoned=False,
                 defender_defense_multipliers=opponent_defense_multipliers
             )
@@ -319,6 +335,7 @@ def perform_battle_simulation(
         ):
             opponent_turns_poisoned: int = -1
             player_turns_poisoned: int = -1
+            opponent_must_charge = False
             while player_health > 0 and opponent_health > 0:
                 actual_player_damage: int = player_attack_damage
                 actual_opponent_damage: int = opponent_attack_damage
@@ -366,7 +383,7 @@ def perform_battle_simulation(
                             get_max_damage_attacker_can_do_to_defender(
                                 attacker=player_pokemon,
                                 defender=opponent_pokemon,
-                                random=0.85,
+                                random=player_random,
                                 is_poisoned=player_turns_poisoned > -1,
                                 defender_defense_multipliers=opponent_defense_multipliers
                             )
@@ -414,14 +431,27 @@ def perform_battle_simulation(
                             get_max_damage_attacker_can_do_to_defender(
                                 attacker=opponent_pokemon,
                                 defender=player_pokemon,
-                                random=1.0,
+                                random=opponent_random,
                                 is_poisoned=opponent_turns_poisoned > -1,
                                 defender_defense_multipliers=player_defense_multipliers
                             )
                         opponent_pokemon.item = ""
 
-                player_health: int = player_health - actual_opponent_damage
                 opponent_health: int = opponent_health - actual_player_damage
+
+                # Handle charge moves from the opponent
+                # Player does not use charge moves
+                opponent_attacked = False
+                if opponent_must_charge:
+                    opponent_must_charge = False
+                else:
+                    player_health: int = player_health - actual_opponent_damage
+                    opponent_attacked = True
+
+                if (opponent_attack.name.lower() in charge_moves and
+                        opponent_attacked
+                ):
+                    opponent_must_charge = True
 
                 # Focus Sash
                 if is_first_turn:
@@ -456,7 +486,7 @@ def perform_battle_simulation(
                     opponent_turns_poisoned += 1
 
                 player_health_gained: int = get_health_gained(
-                    pokemon=player_pokemon,
+                    attacking_pokemon=player_pokemon,
                     move="" if player_attack is None else player_attack.name,
                     attack_damage=player_attack_damage,
                     was_first=player_first,
@@ -470,7 +500,7 @@ def perform_battle_simulation(
                 if player_health > player_max_health:
                     player_health = player_max_health
                 opponent_health_gained: int = get_health_gained(
-                    pokemon=opponent_pokemon,
+                    attacking_pokemon=opponent_pokemon,
                     move="" if not opponent_attack else opponent_attack.name,
                     attack_damage=opponent_attack_damage,
                     max_health=opponent_max_health,
@@ -501,7 +531,7 @@ def perform_battle_simulation(
                         get_max_damage_attacker_can_do_to_defender(
                             attacker=player_pokemon,
                             defender=opponent_pokemon,
-                            random=0.85,
+                            random=player_random,
                             is_poisoned=player_turns_poisoned > -1,
                             defender_defense_multipliers=opponent_defense_multipliers
                         )
@@ -513,7 +543,7 @@ def perform_battle_simulation(
                         get_max_damage_attacker_can_do_to_defender(
                             attacker=opponent_pokemon,
                             defender=player_pokemon,
-                            random=1.0,
+                            random=opponent_random,
                             is_poisoned=opponent_turns_poisoned > -1,
                             defender_defense_multipliers=player_defense_multipliers
                         )
@@ -531,14 +561,14 @@ def perform_battle_simulation(
                 ):
             if player_attack not in win_results:
                 win_results[player_attack] = {}
-            win_results[player_attack][opponent_pokemon.name + set_numbers] = (
+            win_results[player_attack][opponent_pokemon] = (
                 BattleResult(
                     hits=hits
                 ))
         else:
             if player_attack not in lose_results:
                 lose_results[player_attack] = {}
-            lose_results[player_attack][opponent_pokemon.name + set_numbers] = (
+            lose_results[player_attack][opponent_pokemon] = (
                 BattleResult(
                     hits=hits
                 ))
@@ -548,18 +578,64 @@ def perform_battle_simulation(
 
 if __name__ == '__main__':
     g_winners: dict[str, BattleResults] = get_pokemon_to_pokemon_they_can_beat()
-    coverage: dict[str, set[str]] = {
+    coverage: dict[str, set[CustomPokemon]] = {
         name: {
-            opponent for move in result.win_results.values()
-            for opponent in move.keys()
+            opponent for pokemon_sets in result.win_results.values()
+            for opponent in pokemon_sets.keys()
         }
         for name, result in g_winners.items()
     }
 
-    targets = {fp.name + str("".join([str(s) for s in sorted(fp.set_numbers)])) for fp in frontier_pokemon}
+    targets = {convert_frontier_to_custom(pokemon_map, 7, fp) for fp in
+               frontier_pokemon}
+
+    # set 1
+    # 250
+
+    # Set 2
+    # 131
+
+    # Set 3
+    # 199
+
+    # Set 3
+    # 163
+
+    # Set 4
+    # 196
+
+    # Set 5
+    # 118 if using max stats
+
+    # Set 6
+    # 536 if using max stats
+
+    # Set 7
+    # 388 if using min stats
+    # 504 if using max stats
+
+    best_coverage_count = 250
+
+    triples_to_check = [
+        ('Snorlax', 'Starmie', 'Aerodactyl'),
+        ('Snorlax', 'Azelf', 'Aerodactyl'),
+        ('Azelf', 'Heatran', 'Ninjask'),
+        ('Azelf', 'Aerodactyl', 'Gallade'),
+        ('Azelf', 'Rhydon', 'Ninjask')
+    ]
 
     for triple in combinations(coverage.keys(), 3):
-        combined_coverage = \
+        if not triple in triples_to_check:
+            continue
+
+        combined = \
             coverage[triple[0]] | coverage[triple[1]] | coverage[triple[2]]
-        if targets.issubset(combined_coverage):
-            print(triple)
+        if len(combined) == best_coverage_count:
+            missing = targets - combined
+            print(f"\nTriple: {triple}")
+            print(f"Cannot beat: {[m.name for m in missing]}")
+
+            for name in triple:
+                print(f"\n{name}'s best moves:")
+                for move, defeated in g_winners[name].win_results.items():
+                    print(f"  {move.name} - {len(defeated)}")

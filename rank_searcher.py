@@ -8,8 +8,7 @@ from damage_calculator import CustomPokemon, CustomMove, \
 from data_class.PokemonType import PokemonType
 from data_class.SerebiiPokemon import SerebiiPokemon
 from data_class.Stats import Stats
-from data_source.PokemonDataSource import get_all_serebii_pokemon, \
-    get_legal_serebii_pokemon
+from data_source.PokemonDataSource import get_legal_serebii_pokemon
 from data_source.TypeChartDataSource import get_defense_multipliers_for_types
 
 slaking = CustomPokemon(
@@ -379,7 +378,6 @@ def combine_survivability_with_attack_results(
                 hits_taken=survivability,
                 hits_given=attack_result[1]
             ),
-            move=attack_result[0],
         )
     return dict(
         sorted(

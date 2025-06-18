@@ -18,6 +18,13 @@ class FrontierPokemon:
     def __hash__(self):
         return hash((
             self.name,
-            tuple(self.set_numbers),
-            tuple(self.moves),
+            tuple(sorted([m.name for m in self.moves])),
         ))
+
+    def __eq__(self, other):
+        return (
+                isinstance(other, FrontierPokemon)
+                and self.name == other.name
+                and sorted(m.name for m in self.moves) == sorted(
+            m.name for m in other.moves)
+        )
