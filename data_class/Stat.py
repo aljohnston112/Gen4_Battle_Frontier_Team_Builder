@@ -3,6 +3,8 @@ from enum import unique, Enum
 
 import attr
 
+from Config import LEVEL
+
 
 @unique
 class StatEnum(Enum):
@@ -45,18 +47,16 @@ def get_stat_enum(stat: str) -> StatEnum:
 def calculate_health_stat(
         base: int,
         iv: int,
-        ev: int,
-        level: int
+        ev: int
 ) -> int:
-    return (((2 * base + iv + (ev // 4)) * level) // 100) + level + 10
+    return (((2 * base + iv + (ev // 4)) * LEVEL) // 100) + LEVEL + 10
 
 
 def calculate_non_health_stat(
         base: int,
         iv: int,
         ev: int,
-        level: int,
         nature_multiplier: float
 ) -> int:
-    stat: int = ((2 * base + iv + (ev // 4)) * level) // 100 + 5
+    stat: int = ((2 * base + iv + (ev // 4)) * LEVEL) // 100 + 5
     return math.floor(stat * nature_multiplier)

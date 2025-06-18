@@ -79,15 +79,8 @@ __DEFENSE_MULTIPLIERS_CACHE__: \
 
 
 def get_defense_multipliers_for_types(
-        defender_types: frozenset[str]
+        defender_types: frozenset[PokemonType]
 ) -> dict[PokemonType, float]:
-    defender_types: frozenset[PokemonType] = \
-        frozenset([
-            convert_string_to_pokemon_type(pokemon_type)
-            # sort for deterministic order
-            for pokemon_type in sorted(defender_types)
-        ])
-
     if defender_types in __DEFENSE_MULTIPLIERS_CACHE__:
         defender_types: frozenset[PokemonType]
         return deepcopy(__DEFENSE_MULTIPLIERS_CACHE__[defender_types])

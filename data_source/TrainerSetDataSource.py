@@ -126,7 +126,8 @@ def get_frontier_pokemon() -> dict[str, TrainerSet]:
                     types=all_pokemon_types[name],
                     item=item,
                     moves=moves,
-                    effort_values=effort_values
+                    effort_values=effort_values,
+                    set_numbers=[s for s in set_numbers]
                 )
                 trainer_pokemon.add(frontier_pokemon)
             trainer_names: str = ",".join(names)

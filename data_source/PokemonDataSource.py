@@ -948,6 +948,24 @@ def __scrape_serebii_for_pokemon_data__():
     return pokemon_index_to_pokemon
 
 
+BANNED_POKEMON_NAMES = {
+    "Mewtwo", "Mew", "Lugia", "Ho-Oh", "Celebi", "Kyogre", "Groudon",
+    "Rayquaza", "Jirachi", "Deoxys", "Dialga", "Palkia", "Giratina", "Phione",
+    "Manaphy", "Darkrai", "Shaymin", "Arceus"
+}
+
+
+def filter_banned_pokemon(pokemon_map) -> dict[int, SerebiiPokemon]:
+    return {
+        idx: p for idx, p in pokemon_map.items()
+        if p.pokemon_information.name not in BANNED_POKEMON_NAMES
+    }
+
+
+def get_legal_serebii_pokemon() -> dict[int, SerebiiPokemon]:
+    return filter_banned_pokemon(get_all_serebii_pokemon())
+
+
 def get_all_serebii_pokemon() -> dict[int, SerebiiPokemon]:
     if not exists(SEREBII_POKEMON_FILE):
         pokemon_index_to_pokemon: dict[int, SerebiiPokemon] = \
@@ -962,7 +980,7 @@ def get_all_serebii_pokemon() -> dict[int, SerebiiPokemon]:
     with open(SEREBII_POKEMON_FILE, "r") as fo:
         pokemon_index_to_pokemon = cattr.structure(
             json.loads(fo.read()),
-            dict[str, SerebiiPokemon]
+            dict[int, SerebiiPokemon]
         )
     return pokemon_index_to_pokemon
 

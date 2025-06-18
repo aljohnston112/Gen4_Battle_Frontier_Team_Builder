@@ -13,13 +13,11 @@ class FrontierPokemon:
     item: str
     moves: list[Move]
     effort_values: list[Stat]
+    set_numbers: list[int]
 
     def __hash__(self):
         return hash((
             self.name,
-            self.nature,
-            tuple(self.types),
-            self.item,
+            tuple(self.set_numbers),
             tuple(self.moves),
-            tuple(self.effort_values),
         ))
