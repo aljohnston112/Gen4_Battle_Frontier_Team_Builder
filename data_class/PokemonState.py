@@ -80,7 +80,8 @@ bad_moves = {
     "Selfdestruct", "Gyro Ball", "Rock Slide", "Stone Edge", "Trump Card",
     "Outrage", "Iron Tail", "Focus Blast", "Dream Eater", "Spit Up",
     "Frustration", "Thunder", "Hydro Pump", "Blizzard", "Explosion",
-    "Flail", "Reversal", "Solarbeam", "Hyper Beam",
+    "Flail", "Reversal", "Solarbeam", "Hyper Beam", "Punishment",
+    "Seismic Toss", "Dive",
     "Giga Impact", "Last Resort", "Focus Punch", "Fling", "Snore",
     "Grass Knot", "Magnitude", "Low Kick", "Dig", "Hidden Power", "Petal Dance"
 }

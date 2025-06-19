@@ -193,6 +193,7 @@ def apply_health_changes(
     elif hold_item == "Leftovers":
         heal(attacker_state, max_health // 16)
 
+
 type_map: dict[str, list[PokemonType]] = get_pokemon_to_types_map()
 
 pokemon_map: dict[int, SerebiiPokemon] = {
@@ -203,7 +204,7 @@ frontier_pokemon: set[CustomPokemon] = set([
     # max IVs
     convert_frontier_to_custom(pokemon_map, 100, p)
     for p in get_all_frontier_pokemon()
-    if 7 in p.set_numbers
+    # if 7 in p.set_numbers
 ])
 
 
@@ -464,7 +465,7 @@ if __name__ == '__main__':
     # All sets
     # 749 for min stats
 
-    best_coverage_count = 250
+    best_coverage_count = 10000
 
     # triples_to_check = [
     #     ('Snorlax', 'Starmie', 'Aerodactyl'),
@@ -474,12 +475,13 @@ if __name__ == '__main__':
     #     ('Azelf', 'Rhydon', 'Ninjask')
     # ]
 
-    for triple in combinations(coverage.keys(), 3):
+    for triple in combinations(coverage.keys(), 6):
         # if not triple in triples_to_check:
         #     continue
 
         combined = \
-            coverage[triple[0]] | coverage[triple[1]] | coverage[triple[2]]
+            coverage[triple[0]] | coverage[triple[1]] | coverage[triple[2]] | \
+            coverage[triple[3]] | coverage[triple[4]] | coverage[triple[5]]
         if len(combined) >= best_coverage_count:
             missing = frontier_pokemon - combined
             print(f"\nTriple: {triple}")
