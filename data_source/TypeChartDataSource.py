@@ -54,7 +54,7 @@ def get_single_type_multiplier(
 ) -> dict[PokemonType, float]:
     if pokemon_type in __DEFENSE_MULTIPLIER_CACHE__:
         pokemon_type: PokemonType
-        return deepcopy(__DEFENSE_MULTIPLIER_CACHE__[pokemon_type])
+        return __DEFENSE_MULTIPLIER_CACHE__[pokemon_type]
 
     multipliers: defaultdict[PokemonType, float] = defaultdict(lambda: 1.0)
     for t in __DEFENDER_TYPE_MATCHUPS__.type_to_no_effect.get(pokemon_type, []):
@@ -71,7 +71,7 @@ def get_single_type_multiplier(
 
     __DEFENSE_MULTIPLIER_CACHE__[pokemon_type]: dict[PokemonType, float] = \
         multipliers
-    return deepcopy(__DEFENSE_MULTIPLIER_CACHE__[pokemon_type])
+    return __DEFENSE_MULTIPLIER_CACHE__[pokemon_type]
 
 
 __DEFENSE_MULTIPLIERS_CACHE__: \
@@ -83,18 +83,18 @@ def get_defense_multipliers_for_types(
 ) -> dict[PokemonType, float]:
     if defender_types in __DEFENSE_MULTIPLIERS_CACHE__:
         defender_types: frozenset[PokemonType]
-        return deepcopy(__DEFENSE_MULTIPLIERS_CACHE__[defender_types])
+        return __DEFENSE_MULTIPLIERS_CACHE__[defender_types]
 
     result: defaultdict[PokemonType, float] = defaultdict(lambda: 1.0)
     for defender_type in defender_types:
         defender_type: PokemonType
         single_multipliers: dict[PokemonType, float] = \
-            get_single_type_multiplier(defender_type)
+            deepcopy(get_single_type_multiplier(defender_type))
         for attacker_type, multiplier in single_multipliers.items():
             result[attacker_type] *= multiplier
 
     __DEFENSE_MULTIPLIERS_CACHE__[defender_types] = result
-    return deepcopy(__DEFENSE_MULTIPLIERS_CACHE__[defender_types])
+    return __DEFENSE_MULTIPLIERS_CACHE__[defender_types]
 
 
 if __name__ == '__main__':

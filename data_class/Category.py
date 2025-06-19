@@ -20,7 +20,7 @@ __CATEGORY_DICT__: dict[str, Category] = {
 
 
 def convert_to_attack_category(category) -> Category:
-    return __CATEGORY_DICT__[category.lower()]
+    return __CATEGORY_DICT__[category]
 
 if __name__ == '__main__':
     print(__CATEGORY_DICT__)

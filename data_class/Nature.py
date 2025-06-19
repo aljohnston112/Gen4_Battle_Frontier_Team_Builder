@@ -11,31 +11,31 @@ class NatureEnum(Enum):
     """
     Represents the Pokémon natures.
     """
-    HARDY = "hardy"
-    LONELY = "lonely"
-    BRAVE = "brave"
-    ADAMANT = "adamant"
-    NAUGHTY = "naughty"
-    BOLD = "bold"
-    DOCILE = "docile"
-    RELAXED = "relaxed"
-    IMPISH = "impish"
-    LAX = "lax"
-    TIMID = "timid"
-    HASTY = "hasty"
-    SERIOUS = "serious"
-    JOLLY = "jolly"
-    NAIVE = "naive"
-    MODEST = "modest"
-    MILD = "mild"
-    QUIET = "quiet"
-    BASHFUL = "bashful"
-    RASH = "rash"
-    CALM = "calm"
-    GENTLE = "gentle"
-    SASSY = "sassy"
-    CAREFUL = "careful"
-    QUIRKY = "quirky"
+    HARDY = "Hardy"
+    LONELY = "Lonely"
+    BRAVE = "Brave"
+    ADAMANT = "Adamant"
+    NAUGHTY = "Naughty"
+    BOLD = "Bold"
+    DOCILE = "Docile"
+    RELAXED = "Relaxed"
+    IMPISH = "Impish"
+    LAX = "Lax"
+    TIMID = "Timid"
+    HASTY = "Hasty"
+    SERIOUS = "Serious"
+    JOLLY = "Jolly"
+    NAIVE = "Naive"
+    MODEST = "Modest"
+    MILD = "Mild"
+    QUIET = "Quiet"
+    BASHFUL = "Bashful"
+    RASH = "Rash"
+    CALM = "Calm"
+    GENTLE = "Gentle"
+    SASSY = "Sassy"
+    CAREFUL = "Careful"
+    QUIRKY = "Quirky"
 
 
 @frozen
@@ -239,7 +239,7 @@ __STAT_TO_NATURE_MULTIPLIERS__: dict[StatEnum, dict[NatureEnum, float]] = {
 
 def get_nature_enum(name: str) -> NatureEnum:
     try:
-        return NatureEnum(name.lower())
+        return NatureEnum(name)
     except ValueError:
         raise ValueError(f"Unknown nature: {name}")
 

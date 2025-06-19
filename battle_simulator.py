@@ -6,14 +6,16 @@ from attrs import frozen
 
 from damage_calculator import CustomPokemon, CustomMove, IMPLEMENTED_ITEMS, \
     convert_frontier_to_custom, get_max_damage_attacker_can_do_to_defender, \
-    get_all_attacks, bad_moves, convert_to_custom_move, charge_moves
-from data_class.FrontierPokemon import FrontierPokemon
+    get_all_attacks, bad_moves, convert_to_custom_move, charge_moves, \
+    get_stat_for_serebii_pokemon
+from data_class.BaseStats import BaseStats
 from data_class.PokemonType import PokemonType
 from data_class.SerebiiPokemon import SerebiiPokemon
-from data_class.Stats import Stats
+from data_class.Stat import StatEnum
 from data_source.FrontierPokemonDataSource import get_all_frontier_pokemon
 from data_source.PokemonDataSource import get_legal_serebii_pokemon
-from data_source.PokemonIndexDataSource import fully_evolved_obtainable_pokemon
+from data_source.PokemonIndexDataSource import fully_evolved_obtainable_pokemon, \
+    get_pokemon_name_to_index
 from data_source.PokemonTypeDataSource import get_pokemon_to_types_map
 from data_source.TypeChartDataSource import get_defense_multipliers_for_types
 
@@ -51,17 +53,17 @@ def get_health_gained(
     health_gained: int = 0
     health_lost: int = 0
 
-    if move.lower() in ["explosion", "selfdestruct"]:
+    if move in ["Explosion", "Selfdestruct"]:
         return -current_health
 
     recoil: int = 0
-    if move.lower() in [
-        "brave bird", "double-edge", "flare blitz", "volt tackle", "wood hammer"
+    if move in [
+        "Brave Bird", "Double-Edge", "Flare Blitz", "Volt Tackle", "Wood Hammer"
     ]:
         recoil = floor(attack_damage / 3)
-    elif move.lower() in ["head smash"]:
+    elif move in ["Head Smash"]:
         recoil = floor(attack_damage / 2)
-    elif move.lower() in ["submission", "take down"]:
+    elif move in ["Submission", "Take Down"]:
         recoil = floor(attack_damage / 4)
 
     health_lost += recoil
@@ -155,12 +157,21 @@ def apply_damage_modifiers(
     return damage_taken
 
 
-def convert_serebii_to_custom(player_pokemon: SerebiiPokemon) -> CustomPokemon:
+def convert_serebii_to_custom(
+        player_pokemon: SerebiiPokemon,
+        hp_ev: int,
+        attack_ev: int,
+        defense_ev: int,
+        special_attack_ev: int,
+        special_defense_ev: int,
+        speed_ev: int,
+        item: str
+) -> CustomPokemon:
     all_moves = [
         convert_to_custom_move(move)
         for move in get_all_attacks(player_pokemon)
         if
-        move.accuracy == 100 and move.name.lower() not in bad_moves and move.power != 0
+        move.accuracy == 100 and move.name not in bad_moves and move.power != 0
     ]
     best_moves = {}
     for move in all_moves:
@@ -168,158 +179,91 @@ def convert_serebii_to_custom(player_pokemon: SerebiiPokemon) -> CustomPokemon:
         if key not in best_moves or move.power > best_moves[key].power:
             best_moves[key] = move
     filtered_moves = list(best_moves.values())
-    stats: Stats = player_pokemon.all_stats.level_50_max_stats
+    stats: BaseStats = player_pokemon.all_stats.base_stats
     return CustomPokemon(
         name=player_pokemon.pokemon_information.name,
         types=player_pokemon.pokemon_information.pokemon_types,
         moves=filtered_moves,
-        hp=stats.health,
-        attack=stats.attack,
-        special_attack=stats.special_attack,
-        defense=stats.defense,
-        special_defense=stats.special_defense,
-        speed=stats.speed,
-        item=""
+        hp=get_stat_for_serebii_pokemon(stats, hp_ev, StatEnum.HEALTH),
+        attack=get_stat_for_serebii_pokemon(stats, attack_ev, StatEnum.ATTACK),
+        special_attack=get_stat_for_serebii_pokemon(stats, special_attack_ev, StatEnum.SPECIAL_ATTACK),
+        defense=get_stat_for_serebii_pokemon(stats, defense_ev, StatEnum.DEFENSE),
+        special_defense=get_stat_for_serebii_pokemon(stats, special_defense_ev, StatEnum.SPECIAL_DEFENSE),
+        speed=get_stat_for_serebii_pokemon(stats, speed_ev, StatEnum.SPEED),
+        item=item
     )
 
+pokemon_map: dict[int, SerebiiPokemon] = {
+    k: v for k, v in get_legal_serebii_pokemon().items()
+}
 
-frontier_pokemon: set[FrontierPokemon] = set([
-    p for p in get_all_frontier_pokemon()
-    if 0 in p.set_numbers or 1 in p.set_numbers
+frontier_pokemon: set[CustomPokemon] = set([
+    # max IVs
+    convert_frontier_to_custom(pokemon_map, 100, p)
+    for p in get_all_frontier_pokemon()
+    if 1 in p.set_numbers
 ])
 
-azelf = CustomPokemon(
-    name="Azelf",
-    hp=135,
-    attack=130,
-    defense=75,
-    special_attack=161,
-    special_defense=75,
-    speed=151,
-    types=[PokemonType.PSYCHIC],
-    moves=[
-        CustomMove(
-            name="Psychic",
-            move_type=PokemonType.PSYCHIC,
-            power=90,
-            is_special=True
-        ),
-        CustomMove(
-            name="Energy Ball",
-            move_type=PokemonType.GRASS,
-            power=80,
-            is_special=True
-        ),
-        CustomMove(
-            name="Thunderbolt",
-            move_type=PokemonType.ELECTRIC,
-            power=95,
-            is_special=True
-        ),
-        CustomMove(
-            name="Flamethrower",
-            move_type=PokemonType.FIRE,
-            power=95,
-            is_special=True
-        ),
-    ],
-    item=""
-)
-
-rhydon = CustomPokemon(
-    name="Rhydon",
-    hp=165,
-    attack=166,
-    defense=125,
-    special_attack=50,
-    special_defense=81,
-    speed=45,
-    types=[PokemonType.GROUND, PokemonType.ROCK],
-    moves=[
-        CustomMove(
-            name="Earthquake",
-            move_type=PokemonType.GROUND,
-            power=100,
-            is_special=False
-        ),
-        CustomMove(
-            name="Ice Punch",
-            move_type=PokemonType.ICE,
-            power=75,
-            is_special=False
-        ),
-        CustomMove(
-            name="Superpower",
-            move_type=PokemonType.FIGHTING,
-            power=120,
-            is_special=False
-        ),
-        CustomMove(
-            name="Thunder Punch",
-            move_type=PokemonType.ELECTRIC,
-            power=75,
-            is_special=False
-        ),
-    ],
-    item=""
-)
-
-ninjask = CustomPokemon(
-    name="Ninjask",
-    hp=152,
-    attack=126,
-    defense=50,
-    special_attack=55,
-    special_defense=55,
-    speed=165,
-    types=[PokemonType.BUG, PokemonType.FLYING],
-    moves=[
-        CustomMove(
-            name="Aerial Ace",
-            move_type=PokemonType.FLYING,
-            power=60,
-            is_special=False
-        ),
-        CustomMove(
-            name="X-scissor",
-            move_type=PokemonType.BUG,
-            power=80,
-            is_special=False
-        ),
-        CustomMove(
-            name="Return",
-            move_type=PokemonType.NORMAL,
-            power=102,
-            is_special=False
-        ),
-        CustomMove(
-            name="Bug Buzz",
-            move_type=PokemonType.BUG,
-            power=90,
-            is_special=True
-        ),
-    ],
-    item=""
-)
-
+player_random = 1.0
+opponent_random = 1.0
 
 def get_pokemon_to_pokemon_they_can_beat() -> dict[str, BattleResults]:
-    pokemon_map: dict[int, SerebiiPokemon] = get_legal_serebii_pokemon()
-    pokemon_map: dict[int, SerebiiPokemon] = {
-        k: v for k, v in pokemon_map.items()
-        if k in fully_evolved_obtainable_pokemon
-    }
-    # Get the best 4 moves
-    winner_to_moves: dict[str, list[CustomMove]] = dict()
-    # all_player_pokemon = pokemon_map.values()
+    winner_to_defeated: dict[str, BattleResults] = dict()
+
     all_player_pokemon = [
-        azelf, rhydon, ninjask
+        convert_serebii_to_custom(
+            pokemon,
+            hp_ev=0,
+            attack_ev=0,
+            defense_ev=0,
+            special_attack_ev=0,
+            special_defense_ev=0,
+            speed_ev=0,
+            item=""
+        )
+        for k, pokemon in pokemon_map.items()
+        if k in fully_evolved_obtainable_pokemon
     ]
+
+    # pokemon_to_index = get_pokemon_name_to_index()
+    # all_player_pokemon = [
+    #     convert_serebii_to_custom(
+    #         pokemon_map[pokemon_to_index["Heatran"]],
+    #         hp_ev=0,
+    #         attack_ev=0,
+    #         defense_ev=0,
+    #         special_attack_ev=252,
+    #         special_defense_ev=0,
+    #         speed_ev=252,
+    #         item=""
+    #     ),
+    #     convert_serebii_to_custom(
+    #         pokemon_map[pokemon_to_index["Garchomp"]],
+    #         hp_ev=252,
+    #         attack_ev=252,
+    #         defense_ev=0,
+    #         special_attack_ev=0,
+    #         special_defense_ev=0,
+    #         speed_ev=0,
+    #         item=""
+    #     ),
+    #     convert_serebii_to_custom(
+    #         pokemon_map[pokemon_to_index["Mesprit"]],
+    #         hp_ev=252,
+    #         attack_ev=0,
+    #         defense_ev=0,
+    #         special_attack_ev=252,
+    #         special_defense_ev=0,
+    #         speed_ev=0,
+    #         item="Choice Specs"
+    #     )
+    # ]
+
     for player_pokemon in all_player_pokemon:
-        # player_pokemon: CustomPokemon = \
-        #     convert_serebii_to_custom(player_pokemon)
+        # Get the best 4 moves
         player_defense_multipliers: dict[PokemonType, float] = \
-            get_defense_multipliers_for_types(frozenset(player_pokemon.types))
+            get_defense_multipliers_for_types(
+                frozenset(player_pokemon.types))
 
         player_item_backup: str = str(player_pokemon.item)
         if player_pokemon.item not in IMPLEMENTED_ITEMS:
@@ -342,27 +286,9 @@ def get_pokemon_to_pokemon_they_can_beat() -> dict[str, BattleResults]:
             key=lambda x: len(x[1]),
             reverse=True
         )[:4])
-        winner_to_moves[player_pokemon.name] = [k for k in win_results.keys()]
+        player_pokemon.moves = [k for k in win_results.keys()]
 
-    # Get the battle results using the best 4 moves of each Pokémon
-    winner_to_defeated: dict[str, BattleResults] = dict()
-    for player_pokemon in all_player_pokemon:
-        # player_pokemon: CustomPokemon = convert_serebii_to_custom(
-        #     player_pokemon
-        # )
-        player_pokemon.moves = winner_to_moves[player_pokemon.name]
-        player_defense_multipliers: dict[PokemonType, float] = \
-            get_defense_multipliers_for_types(
-                frozenset(player_pokemon.types))
-
-        player_item_backup: str = str(player_pokemon.item)
-        if player_pokemon.item not in IMPLEMENTED_ITEMS:
-            raise Exception(f"Item {player_pokemon.item} not implemented")
-        player_max_health: int = player_pokemon.hp
-        player_speed_stat: int = player_pokemon.speed
-        if player_pokemon.item == "Choice Scarf":
-            player_speed_stat: int = floor(1.5 * player_speed_stat)
-
+        # Get the battle results using the best 4 moves of each Pokémon
         lose_results, win_results = perform_battle_simulation(
             player_pokemon=player_pokemon,
             player_defense_multipliers=player_defense_multipliers,
@@ -382,27 +308,18 @@ def get_pokemon_to_pokemon_they_can_beat() -> dict[str, BattleResults]:
         reverse=True
     ))
 
-
-pokemon_map = get_legal_serebii_pokemon()
-player_random = 1.0
-opponent_random = 1.0
-
-
 def perform_battle_simulation(
         player_pokemon: CustomPokemon,
         player_defense_multipliers: dict[PokemonType, float],
         player_max_health: int,
         player_speed_stat: int,
 ):
-    win_results: dict[CustomMove, dict[CustomPokemon, BattleResult]] = dict()
-    lose_results: dict[CustomMove, dict[CustomPokemon, BattleResult]] = dict()
+    win_results: dict[
+        CustomMove, dict[CustomPokemon, BattleResult]] = dict()
+    lose_results: dict[
+        CustomMove, dict[CustomPokemon, BattleResult]] = dict()
 
     for i, opponent_pokemon in enumerate(frontier_pokemon):
-        opponent_pokemon: CustomPokemon = convert_frontier_to_custom(
-            pokemon_map,
-            100,
-            opponent_pokemon
-        )
         opponent_defense_multipliers: dict[PokemonType, float] = \
             get_defense_multipliers_for_types(
                 frozenset(opponent_pokemon.types)
@@ -447,7 +364,6 @@ def perform_battle_simulation(
         opponent_health: int = opponent_max_health
         is_first_turn = True
         # TODO pluck and bug bite will eat berries
-
         if ((opponent_attack_damage != 0 or player_attack_damage != 0)
                 and opponent_attack and player_attack
         ):
@@ -566,8 +482,8 @@ def perform_battle_simulation(
                     player_health: int = player_health - actual_opponent_damage
                     opponent_attacked = True
 
-                if (opponent_attack.name.lower() in charge_moves and
-                        opponent_attacked
+                if ((opponent_attack.name in charge_moves and
+                        opponent_attacked) or opponent_pokemon.name == "Slaking"
                 ):
                     opponent_must_charge = True
 
@@ -693,9 +609,9 @@ def perform_battle_simulation(
         opponent_pokemon.item = opponent_item_backup
     return lose_results, win_results
 
-
 if __name__ == '__main__':
-    g_winners: dict[str, BattleResults] = get_pokemon_to_pokemon_they_can_beat()
+    g_winners: dict[
+        str, BattleResults] = get_pokemon_to_pokemon_they_can_beat()
     coverage: dict[str, set[CustomPokemon]] = {
         name: {
             opponent for pokemon_sets in result.win_results.values()
@@ -704,35 +620,41 @@ if __name__ == '__main__':
         for name, result in g_winners.items()
     }
 
-    targets = {convert_frontier_to_custom(pokemon_map, 7, fp) for fp in
-               frontier_pokemon}
-
     # set 1
     # 250
 
     # Set 2
+    # 131 for min
     # 131
 
     # Set 3
+    # 180 for min
     # 199
 
     # Set 3
+    # 134 for min
     # 163
 
     # Set 4
+    # 156 for min
     # 196
 
     # Set 5
+    # 95 if using min stats
     # 118 if using max stats
 
     # Set 6
+    # 397 for min stats
     # 536 if using max stats
 
     # Set 7
-    # 388 if using min stats
+    # 376 if using min stats
     # 504 if using max stats
 
-    best_coverage_count = 0
+    # All sets
+    # 749 for min stats
+
+    best_coverage_count = 131
 
     # triples_to_check = [
     #     ('Snorlax', 'Starmie', 'Aerodactyl'),
@@ -749,9 +671,9 @@ if __name__ == '__main__':
         combined = \
             coverage[triple[0]] | coverage[triple[1]] | coverage[triple[2]]
         if len(combined) >= best_coverage_count:
-            missing = targets - combined
+            missing = frontier_pokemon - combined
             print(f"\nTriple: {triple}")
-            print(f"Cannot beat: {[m.name for m in missing]}")
+            print(f"Cannot beat {len(missing)}: {[m.name for m in missing]}")
 
             for name in triple:
                 print(f"\n{name}'s best moves:")

@@ -56,7 +56,7 @@ def convert_string_to_pokemon_type(pokemon_type: str) -> PokemonType:
     :param pokemon_type: The string of the type.
     :return: The enum representing pokemon_type.
     """
-    return __TYPE_DICT__[pokemon_type.lower()]
+    return __TYPE_DICT__[pokemon_type]
 
 
 if __name__ == '__main__':

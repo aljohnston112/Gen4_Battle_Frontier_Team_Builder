@@ -63,28 +63,67 @@ class CustomPokemon:
         )
 
 
+def get_base_stat(base_stats: BaseStats, stat_enum: StatEnum) -> int:
+    stats = base_stats.stats
+    if stat_enum == StatEnum.HEALTH:
+        return stats.health
+    elif stat_enum == StatEnum.ATTACK:
+        return stats.attack
+    elif stat_enum == StatEnum.DEFENSE:
+        return stats.defense
+    elif stat_enum == StatEnum.SPECIAL_ATTACK:
+        return stats.special_attack
+    elif stat_enum == StatEnum.SPECIAL_DEFENSE:
+        return stats.special_defense
+    elif stat_enum == StatEnum.SPEED:
+        return stats.speed
+    else:
+        raise ValueError(" Bad stat enum: " + stat_enum.name)
+
+
+def get_stat_for_serebii_pokemon(
+        base_stats: BaseStats,
+        ev: int,
+        stat_enum: StatEnum,
+) -> int:
+    stats: Stats = base_stats.stats
+    if stat_enum == StatEnum.HEALTH:
+        stat: int = calculate_health_stat(
+            base=stats.health,
+            iv=0,
+            ev=ev
+        )
+    else:
+        stat: int = calculate_non_health_stat(
+            base=get_base_stat(base_stats, stat_enum),
+            iv=0,
+            ev=ev,
+            nature_multiplier=1.0
+        )
+    return stat
+
+
 def get_stat_for_frontier_pokemon(
         frontier_pokemon: FrontierPokemon,
         base_stats: BaseStats,
         iv: int,
         stat_enum: StatEnum,
 ) -> int:
-    base_stats: Stats = base_stats.stats
+    stats: Stats = base_stats.stats
     ev = next(
         (s.value for s in frontier_pokemon.effort_values
          if s.stat_type == stat_enum),
     )
     if stat_enum == StatEnum.HEALTH:
         stat: int = calculate_health_stat(
-            base=base_stats.health,
+            base=stats.health,
             iv=iv,
             ev=ev
         )
     else:
-
         nature_enum: NatureEnum = get_nature_enum(frontier_pokemon.nature)
         stat: int = calculate_non_health_stat(
-            base=base_stats.speed,
+            base=get_base_stat(base_stats, stat_enum),
             iv=iv,
             ev=ev,
             nature_multiplier=
@@ -123,7 +162,7 @@ def convert_frontier_to_custom(
         frontier_pokemon=frontier_pokemon,
         base_stats=base_stats,
         iv=iv,
-        stat_enum=StatEnum.HP,
+        stat_enum=StatEnum.HEALTH,
     )
 
     attack: int = get_stat_for_frontier_pokemon(
@@ -197,7 +236,7 @@ def calculate_gen4_damage(
     return damage
 
 
-charge_moves = ["giga impact", "hyper beam", "rock wrecker"]
+charge_moves = ["Giga Impact", "Hyper Beam", "Rock Wrecker"]
 
 # TODO Focus Band, King's Rock, Lansat Berry, Lax Incense, Light Clay,
 #  Lucky Punch, Mental Herb, Razor Claw, Razor Fang, Scope Lens, Stick
@@ -327,7 +366,7 @@ def get_max_damage_attacker_can_do_to_defender(
                 damage: int = floor(1.2 * damage)
             if attacker_item == "Life Orb":
                 damage: int = floor(1.3 * damage)
-        if pokemon_move.name.lower() in charge_moves:
+        if pokemon_move.name in charge_moves:
             if damage > charge_move_damage:
                 charge_move: CustomMove = pokemon_move
             charge_move_damage: int = max(damage, charge_move_damage)
@@ -398,12 +437,12 @@ def get_all_attacks(pokemon: SerebiiPokemon) -> list[Move]:
 
 
 bad_moves = {
-    "selfdestruct", "gyro ball", "rock slide", "stone edge",
-    "outrage", "iron tail", "focus blast", "dream eater", "spit up",
-    "frustration", "thunder", "hydro pump", "blizzard", "explosion",
-    "self-destruct", "flail", "reversal", "solarbeam", "hyper beam",
-    "giga impact", "last resort", "focus punch", "fling", "snore",
-    "grass knot", "magnitude", "low kick", "dig", "hidden power", "petal dance"
+    "Selfdestruct", "Gyro Ball", "Rock Slide", "Stone Edge",
+    "Outrage", "Iron Tail", "Focus Blast", "Dream Eater", "Spit Up",
+    "Frustration", "Thunder", "Hydro Pump", "Blizzard", "Explosion",
+    "Flail", "Reversal", "Solarbeam", "Hyper Beam",
+    "Giga Impact", "Last Resort", "Focus Punch", "Fling", "Snore",
+    "Grass Knot", "Magnitude", "Low Kick", "Dig", "Hidden Power", "Petal Dance"
 }
 
 
@@ -435,7 +474,7 @@ def find_best_attack_against_target(
 
         for move in get_all_attacks(pokemon):
             move: Move
-            if move.name.lower() in bad_moves or move.accuracy != 100:
+            if move.name in bad_moves or move.accuracy != 100:
                 continue
 
             if move.power == 0:
@@ -445,7 +484,7 @@ def find_best_attack_against_target(
             multiplier: float = \
                 o_type_multipliers[move_type]
             power: int = move.power
-            is_special: bool = move.category.name.lower() == "special"
+            is_special: bool = move.category.name == "special"
             attack_stat: int = special_attack if is_special else attack
             defense_stat: int = o_special_defense if is_special else o_defense
             is_stab: bool = move_type in pokemon_types

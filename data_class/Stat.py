@@ -41,7 +41,7 @@ __STAT_DICT__: dict[str, StatEnum] = {
 
 
 def get_stat_enum(stat: str) -> StatEnum:
-    return __STAT_DICT__[stat.lower()]
+    return __STAT_DICT__[stat]
 
 
 def calculate_health_stat(
