@@ -123,7 +123,7 @@ def convert_frontier_to_custom(
         frontier_pokemon=frontier_pokemon,
         base_stats=base_stats,
         iv=iv,
-        stat_enum=StatEnum.SPEED,
+        stat_enum=StatEnum.HP,
     )
 
     attack: int = get_stat_for_frontier_pokemon(
