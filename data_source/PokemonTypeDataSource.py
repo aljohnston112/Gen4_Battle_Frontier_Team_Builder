@@ -1,5 +1,6 @@
 import json
 import pprint
+import typing
 
 import cattr
 
@@ -13,6 +14,7 @@ def get_pokemon_to_types_map() -> dict[str, list[PokemonType]]:
     :return: The name to Pokémon dict containing all possible battle frontier Pokémon.
     """
     with open(POKEMON_TYPE_FILE, "r") as fo:
+        fo: typing.IO
         pokemon_to_types: dict[str, list[PokemonType]] = cattr.structure(
             json.loads(fo.read()),
             dict[str, list[PokemonType]]

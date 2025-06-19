@@ -29,6 +29,13 @@ class Stat:
     def __hash__(self):
         return hash((self.stat_type, self.value))
 
+    def __eq__(self, other):
+        return (
+                other is Stat and
+                self.stat_type == other.stat_type and
+                self.value == other.value
+        )
+
 
 __STAT_DICT__: dict[str, StatEnum] = {
     StatEnum.HEALTH.value: StatEnum.HEALTH,

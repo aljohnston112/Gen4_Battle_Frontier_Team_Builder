@@ -4,7 +4,7 @@ from enum import unique, Enum
 @unique
 class Category(Enum):
     """
-    Represents whether a Pokémon move of physical or special.
+    Represents whether a Pokémon move is physical or special.
     """
     PHYSICAL = "physical"
     SPECIAL = "special"
@@ -15,7 +15,6 @@ __CATEGORY_DICT__: dict[str, Category] = {
     Category.PHYSICAL.value: Category.PHYSICAL,
     Category.SPECIAL.value: Category.SPECIAL,
     Category.STATUS.value: Category.STATUS,
-    "other": Category.STATUS
 }
 
 

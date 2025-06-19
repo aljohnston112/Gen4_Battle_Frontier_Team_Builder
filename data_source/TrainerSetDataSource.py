@@ -13,6 +13,13 @@ from data_source.PokemonTypeDataSource import get_pokemon_to_types_map
 from data_source.move_data_source import get_move_map
 
 
+@frozen
+class TrainerSet:
+    trainer_name: str
+    set_numbers: set[int]
+    pokemon: set[FrontierPokemon]
+
+
 def get_next_non_newline(file: typing.IO) -> str:
     """
     Gets the next line that is not a new line from a file.
@@ -44,20 +51,6 @@ def __get_set_to_trainers__() -> dict[int, list[str]]:
 def __parse_effort_value__(stat_enum: StatEnum, stat_token: str) -> Stat:
     ev: int = int(stat_token) if stat_token != "-" else 0
     return Stat(stat_enum, ev)
-
-
-@frozen
-class TrainerSet:
-    trainer_name: str
-    set_numbers: set[int]
-    pokemon: set[FrontierPokemon]
-
-    def __hash__(self):
-        return hash((
-            self.trainer_name,
-            tuple(self.set_numbers),
-            tuple(self.pokemon),
-        ))
 
 
 def get_frontier_pokemon() -> dict[str, TrainerSet]:

@@ -36,7 +36,6 @@ __TYPE_DICT__: dict[str, PokemonType] = {
     PokemonType.GROUND.value: PokemonType.GROUND,
     PokemonType.ROCK.value: PokemonType.ROCK,
     PokemonType.BUG.value: PokemonType.BUG,
-    "curse": PokemonType.GHOST,
     PokemonType.GHOST.value: PokemonType.GHOST,
     PokemonType.STEEL.value: PokemonType.STEEL,
     PokemonType.FIRE.value: PokemonType.FIRE,

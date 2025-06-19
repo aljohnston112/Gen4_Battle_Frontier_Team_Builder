@@ -1,5 +1,6 @@
 import json
 import pprint
+import typing
 
 import cattrs
 
@@ -13,6 +14,7 @@ def get_move_map() -> dict[str, Move]:
     :return: A dictionary of move names to detailed move data.
     """
     with open(MOVES_FILE, "r") as fo:
+        fo: typing.IO
         moves = cattrs.structure(
             json.loads(fo.read()),
             dict[str, Move]

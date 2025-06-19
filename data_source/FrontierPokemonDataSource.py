@@ -16,5 +16,5 @@ def get_all_frontier_pokemon() -> set[FrontierPokemon]:
     return all_frontier_pokemon
 
 if __name__ == '__main__':
-    g_all_frontier_pokemon = get_all_frontier_pokemon()
+    g_all_frontier_pokemon: set[FrontierPokemon] = get_all_frontier_pokemon()
     pprint.pprint(g_all_frontier_pokemon)

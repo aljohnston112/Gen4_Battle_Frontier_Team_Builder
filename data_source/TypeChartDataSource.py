@@ -1,4 +1,5 @@
 import json
+import typing
 from collections import defaultdict
 from copy import deepcopy
 from pprint import pp
@@ -9,7 +10,7 @@ import cattr
 from attrs import frozen
 
 from Config import ATTACKER_TYPE_FILE, DEFENDER_TYPE_FILE
-from data_class.PokemonType import PokemonType, convert_string_to_pokemon_type
+from data_class.PokemonType import PokemonType
 
 
 @frozen
@@ -36,11 +37,13 @@ def build_type_matchups(
 
 def get_attack_type_dict() -> TypeMatchups:
     with open(ATTACKER_TYPE_FILE, "r") as fo:
+        fo: typing.IO
         return cattr.structure(json.loads(fo.read()), TypeMatchups)
 
 
 def get_defender_type_matchups() -> TypeMatchups:
     with open(DEFENDER_TYPE_FILE, "r") as fo:
+        fo: typing.IO
         return cattr.structure(json.loads(fo.read()), TypeMatchups)
 
 
@@ -60,12 +63,16 @@ def get_single_type_multiplier(
     for t in __DEFENDER_TYPE_MATCHUPS__.type_to_no_effect.get(pokemon_type, []):
         t: PokemonType
         multipliers[t] *= 0.0
-    for t in __DEFENDER_TYPE_MATCHUPS__.type_to_not_effective.get(pokemon_type,
-                                                                  []):
+    for t in __DEFENDER_TYPE_MATCHUPS__.type_to_not_effective.get(
+            pokemon_type,
+            []
+    ):
         t: PokemonType
         multipliers[t] *= 0.5
     for t in __DEFENDER_TYPE_MATCHUPS__.type_to_super_effective.get(
-            pokemon_type, []):
+            pokemon_type,
+            []
+    ):
         t: PokemonType
         multipliers[t] *= 2.0
 
