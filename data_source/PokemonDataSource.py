@@ -8,17 +8,25 @@ from collections import defaultdict
 from os.path import exists
 
 import cattr
+from attrs import frozen
 from bs4 import BeautifulSoup
 
 from Config import SEREBII_POKEMON_FILE
-from data_class.AllStats import AllStats
-from data_class.BaseStats import BaseStats
 from data_class.Category import convert_to_attack_category
 from data_class.Move import Move
-from data_class.PokemonInformation import PokemonInformation
-from data_class.PokemonType import convert_string_to_pokemon_type
+from data_class.PokemonType import convert_string_to_pokemon_type, PokemonType
 from data_class.SerebiiPokemon import SerebiiPokemon
 from data_class.Stats import Stats
+
+
+@frozen
+class PokemonInformation:
+    name: str
+    pokemon_types: list[PokemonType]
+    id: int
+    ability: str
+    pounds: float
+
 
 __BASE_URL__: str = "https://www.serebii.net/pokedex-dp/"
 __NUM_POKEMON__: int = 493
@@ -128,12 +136,16 @@ def get_level_up_attacks(dextable):
             .split("/")[-1] \
             .split(".")[0] \
             .strip()
+        if pokemon_type == "curse":
+            pokemon_type = "ghost"
         category_images = columns[3].find_all("img")
         assert len(category_images) == 1
         category = category_images[0]['src'] \
             .split("/")[-1] \
             .split(".")[0] \
             .strip()
+        if category == "other":
+            category = "status"
         power = columns[4].text
         if power == "--" or \
                 name == "Endeavor" or \
@@ -144,37 +156,39 @@ def get_level_up_attacks(dextable):
                 name == "Counter" or \
                 name == "Bide" or \
                 name == "Metal Burst":
-            power = 0
+            power = -1
         elif name == "Gyro Ball" or name == "Magnitude":
-            power = 150
+            power = -1
         elif name == "Horn Drill" or \
                 name == "Fissure" or \
                 name == "Sheer Cold" or \
                 name == "Guillotine":
             power = -1
         elif name == "Natural Gift":
-            power = 80
+            power = -1
         elif name == "Low Kick" or name == "Present":
-            power = 120
+            power = -1
         elif name == "Seismic Toss" or name == "Night Shade":
-            power = 100
+            power = -1
         elif name == "Punishment" or \
                 name == "Reversal" or \
                 name == "Flail" or \
                 name == "Trump Card":
-            power = 200
+            power = -1
         elif name == "Fling":
-            power = 130
-        elif name == "Wring Out" or name == "Frustration" or name == "Return":
+            power = -1
+        elif name == "Wring Out":
+            power = -1
+        elif name == "Frustration" or name == "Return":
             power = 102
         elif name == "Spit Up":
-            power = 300
+            power = -1
         elif name == "Hidden Power":
-            power = 70
+            power = -1
         elif name == "Psywave":
-            power = 150
+            power = -1
         elif name == "Crush Grip":
-            power = 121
+            power = -1
         power = int(power)
         accuracy = columns[5].text
         if accuracy == "--":
@@ -220,21 +234,23 @@ def get_tm_and_hm_attacks(dextable):
             .split("/")[-1] \
             .split(".")[0] \
             .strip()
+        if category == "other":
+            category = "status"
         power = columns[4].text
         if power == "--":
             power = 0
         elif name == "Hidden Power":
-            power = 70
+            power = -1
         elif name == "Frustration" or name == "Return":
             power = 102
         elif name == "Natural Gift":
-            power = 80
+            power = -1
         elif name == "Grass Knot":
-            power = 120
+            power = -1
         elif name == "Fling":
-            power = 130
+            power = -1
         elif name == "Gyro Ball":
-            power = 150
+            power = -1
         power = int(power)
         accuracy = columns[5].text
         if accuracy == "--":
@@ -279,12 +295,16 @@ def get_attacks(dextable):
             .split("/")[-1] \
             .split(".")[0] \
             .strip()
+        if pokemon_type == "curse":
+            pokemon_type = "ghost"
         category_images = columns[2].find_all("img")
         assert len(category_images) == 1
         category = category_images[0]['src'] \
             .split("/")[-1] \
             .split(".")[0] \
             .strip()
+        if category == "other":
+            category = "status"
         power = columns[3].text
         if power == "--" or \
                 name == "Belly Drum" or \
@@ -296,31 +316,31 @@ def get_attacks(dextable):
                 name == "Sonicboom":
             power = 0
         if name == "Hidden Power":
-            power = 70
+            power = -1
         elif name == "Frustration" or name == "Return":
             power = 102
         elif name == "Natural Gift":
-            power = 80
+            power = -1
         elif name == "Grass Knot" or name == "Present":
-            power = 120
+            power = -1
         elif (name == "Flail" or
               name == "Reversal" or
               name == "Punishment" or
               name == "Trump Card"
         ):
-            power = 200
+            power = -1
         elif name == "Horn Drill" or name == "Fissure" or name == "Sheer Cold":
             power = -1
         elif name == "Spit Up":
-            power = 300
+            power = -1
         elif name == "Psywave" or name == "Magnitude":
-            power = 150
+            power = -1
         elif name == "Wring Out":
-            power = 102
+            power = -1
         elif name == "Night Shade" or name == "Seismic Toss":
-            power = 100
+            power = -1
         elif name == "Low Kick":
-            power = 120
+            power = -1
         power = int(power)
 
         accuracy = columns[4].text
@@ -366,17 +386,19 @@ def get_third_gen_moves(dextable):
             .split("/")[-1] \
             .split(".")[0] \
             .strip()
+        if category == "other":
+            category = "status"
         power = columns[3].text
         if power == "--":
             power = 0
         if name == "Hidden Power":
-            power = 70
+            power = -1
         elif name == "Frustration" or name == "Return":
             power = 102
         elif name == "Natural Gift":
-            power = 80
+            power = -1
         elif name == "Grass Knot":
-            power = 120
+            power = -1
         power = int(power)
         accuracy = columns[4].text
         if accuracy == "--":
@@ -437,17 +459,19 @@ def get_forms_move_tutor_attacks(dextable):
             .split("/")[-1] \
             .split(".")[0] \
             .strip()
+        if category == "other":
+            category = "status"
         power = columns[3].text
         if power == "--" or name == "Endeavor":
             power = 0
         if name == "Hidden Power":
-            power = 70
+            power = -1
         elif name == "Frustration" or name == "Return":
             power = 102
         elif name == "Natural Gift":
-            power = 80
+            power = -1
         elif name == "Grass Knot":
-            power = 120
+            power = -1
         power = int(power)
         accuracy = columns[4].text
         if accuracy == "--":
@@ -507,117 +531,15 @@ def get_stats(dextable, name):
     base_special_attack = int(base_stat_tokens[4])
     base_special_defense = int(base_stat_tokens[5])
     base_speed = int(base_stat_tokens[6])
-    base_stats = BaseStats(
-        name,
-        Stats(
-            name=name,
-            health=base_hp,
-            attack=base_attack,
-            defense=base_defense,
-            special_attack=base_special_attack,
-            special_defense=base_special_defense,
-            speed=base_speed
-        )
+    base_stats = Stats(
+        health=base_hp,
+        attack=base_attack,
+        defense=base_defense,
+        special_attack=base_special_attack,
+        special_defense=base_special_defense,
+        speed=base_speed
     )
-    max_stats_hindering_nature_tokens = rows[3].text.split("\n")
-    level_50_min_hp_stat = int(
-        max_stats_hindering_nature_tokens[2].split("-")[0].strip())
-    level_50_min_attack_stat = int(
-        max_stats_hindering_nature_tokens[3].split("-")[0].strip())
-    level_50_min_defense_stat = int(
-        max_stats_hindering_nature_tokens[4].split("-")[0].strip())
-    level_50_min_special_attack_stat = int(
-        max_stats_hindering_nature_tokens[5].split("-")[0].strip())
-    level_50_min_special_defense_stat = int(
-        max_stats_hindering_nature_tokens[6].split("-")[0].strip())
-    level_50_min_speed_stat = int(
-        max_stats_hindering_nature_tokens[7].split("-")[0].strip())
-    level_50_min_stats = Stats(
-        name=name,
-        health=level_50_min_hp_stat,
-        attack=level_50_min_attack_stat,
-        defense=level_50_min_defense_stat,
-        special_attack=level_50_min_special_attack_stat,
-        special_defense=level_50_min_special_defense_stat,
-        speed=level_50_min_speed_stat
-    )
-
-    max_stats_hindering_nature_tokens = rows[4].text.split("\n")
-    level_100_min_hp_stat = int(
-        max_stats_hindering_nature_tokens[1].split("-")[0].strip())
-    level_100_min_attack_stat = int(
-        max_stats_hindering_nature_tokens[2].split("-")[0].strip())
-    level_100_min_defense_stat = int(
-        max_stats_hindering_nature_tokens[3].split("-")[0].strip())
-    level_100_min_special_attack_stat = int(
-        max_stats_hindering_nature_tokens[4].split("-")[0].strip())
-    level_100_min_special_defense_stat = int(
-        max_stats_hindering_nature_tokens[5].split("-")[0].strip())
-    level_100_min_speed_stat = int(
-        max_stats_hindering_nature_tokens[6].split("-")[0].strip())
-    level_100_min_stats = Stats(
-        name=name,
-        health=level_100_min_hp_stat,
-        attack=level_100_min_attack_stat,
-        defense=level_100_min_defense_stat,
-        special_attack=level_100_min_special_attack_stat,
-        special_defense=level_100_min_special_defense_stat,
-        speed=level_100_min_speed_stat
-    )
-
-    max_stats_beneficial_nature_tokens = rows[7].text.split("\n")
-    level_50_max_hp_stat = int(
-        max_stats_beneficial_nature_tokens[2].split("-")[1].strip())
-    level_50_max_attack_stat = int(
-        max_stats_beneficial_nature_tokens[3].split("-")[1].strip())
-    level_50_max_defense_stat = int(
-        max_stats_beneficial_nature_tokens[4].split("-")[1].strip())
-    level_50_max_special_attack_stat = int(
-        max_stats_beneficial_nature_tokens[5].split("-")[1].strip())
-    level_50_max_special_defense_stat = int(
-        max_stats_beneficial_nature_tokens[6].split("-")[1].strip())
-    level_50_max_speed_stat = int(
-        max_stats_beneficial_nature_tokens[7].split("-")[1].strip())
-    level_50_max_stats = Stats(
-        name=name,
-        health=level_50_max_hp_stat,
-        attack=level_50_max_attack_stat,
-        defense=level_50_max_defense_stat,
-        special_attack=level_50_max_special_attack_stat,
-        special_defense=level_50_max_special_defense_stat,
-        speed=level_50_max_speed_stat
-    )
-
-    max_stats_beneficial_nature_tokens = rows[8].text.split("\n")
-    level_100_max_hp_stat = int(
-        max_stats_beneficial_nature_tokens[1].split("-")[1].strip())
-    level_100_max_attack_stat = int(
-        max_stats_beneficial_nature_tokens[2].split("-")[1].strip())
-    level_100_max_defense_stat = int(
-        max_stats_beneficial_nature_tokens[3].split("-")[1].strip())
-    level_100_max_special_attack_stat = int(
-        max_stats_beneficial_nature_tokens[4].split("-")[1].strip())
-    level_100_max_special_defense_stat = int(
-        max_stats_beneficial_nature_tokens[5].split("-")[1].strip())
-    level_100_max_speed_stat = int(
-        max_stats_beneficial_nature_tokens[6].split("-")[1].strip())
-    level_100_max_stats = Stats(
-        name=name,
-        health=level_100_max_hp_stat,
-        attack=level_100_max_attack_stat,
-        defense=level_100_max_defense_stat,
-        special_attack=level_100_max_special_attack_stat,
-        special_defense=level_100_max_special_defense_stat,
-        speed=level_100_max_speed_stat
-    )
-    return AllStats(
-        name=name,
-        base_stats=base_stats,
-        level_50_min_stats=level_50_min_stats,
-        level_50_max_stats=level_50_max_stats,
-        level_100_min_stats=level_100_min_stats,
-        level_100_max_stats=level_100_max_stats
-    )
+    return base_stats
 
 
 def get_pre_evolution_moves(dextable):
@@ -634,7 +556,7 @@ def get_pre_evolution_moves(dextable):
         ):
             current_index = len(rows)
         else:
-            name = columns[0].text.strip()
+            move_name = columns[0].text.strip()
             type_images = columns[1].find_all("img")
             assert len(type_images) == 1
             pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[
@@ -645,28 +567,32 @@ def get_pre_evolution_moves(dextable):
                 .split("/")[-1] \
                 .split(".")[0] \
                 .strip()
+            if category == 'other':
+                category = "status"
             power = columns[3].text
             if (power == "--" or
-                    name == "Endeavor" or
-                    name == "Bide" or
-                    name == 'Night Shade'
+                    move_name == "Endeavor" or
+                    move_name == "Bide" or
+                    move_name == 'Night Shade'
             ):
                 power = 0
-            if name == "Hidden Power":
-                power = 70
-            elif (name == "Frustration" or
-                  name == "Return" or
-                  name == "Wring Out"
+            if move_name == "Hidden Power":
+                power = -1
+            elif (move_name == "Frustration" or
+                  move_name == "Return"
+
             ):
                 power = 102
-            elif name == "Natural Gift":
-                power = 80
-            elif name == "Grass Knot":
-                power = 120
-            elif name == "Horn Drill" or name == "Fissure":
+            elif move_name == "Wring Out":
                 power = -1
-            elif name == "Reversal" or name == "Flail" or name == "Trump Card":
-                power = 200
+            elif move_name == "Natural Gift":
+                power = -1
+            elif move_name == "Grass Knot":
+                power = -1
+            elif move_name == "Horn Drill" or move_name == "Fissure":
+                power = -1
+            elif move_name == "Reversal" or move_name == "Flail" or move_name == "Trump Card":
+                power = -1
             power = int(power)
             accuracy = columns[4].text
             if accuracy == "--":
@@ -678,7 +604,7 @@ def get_pre_evolution_moves(dextable):
             effect_chance = int(effect_chance)
             attack = (
                 Move(
-                    name=name,
+                    name=move_name,
                     move_type=convert_string_to_pokemon_type(pokemon_type),
                     category=convert_to_attack_category(category),
                     power=power,
@@ -713,7 +639,7 @@ def get_tm_and_hm_attacks_for_forms(dextable):
     while current_index < len(rows):
         columns = rows[current_index].find_all("td")
         tm_or_hm = columns[0].text.strip()
-        name = columns[1].text.strip()
+        move_name = columns[1].text.strip()
         type_images = columns[2].find_all("img")
         assert len(type_images) == 1
         pokemon_type = type_images[0]['src'].split("/")[-1].split(".")[
@@ -722,19 +648,21 @@ def get_tm_and_hm_attacks_for_forms(dextable):
         assert len(category_images) == 1
         category = category_images[0]['src'].split("/")[-1].split(".")[
             0].strip()
+        if category == 'other':
+            category = "status"
         power = columns[4].text
         if power == "--":
             power = 0
-        if name == "Hidden Power":
-            power = 70
-        elif name == "Frustration" or name == "Return":
+        if move_name == "Hidden Power":
+            power = -1
+        elif move_name == "Frustration" or move_name == "Return":
             power = 102
-        elif name == "Natural Gift":
-            power = 80
-        elif name == "Grass Knot":
-            power = 120
-        elif name == "Gyro Ball":
-            power = 150
+        elif move_name == "Natural Gift":
+            power = -1
+        elif move_name == "Grass Knot":
+            power = -1
+        elif move_name == "Gyro Ball":
+            power = -1
         power = int(power)
         accuracy = columns[5].text
         if accuracy == "--":
@@ -744,7 +672,7 @@ def get_tm_and_hm_attacks_for_forms(dextable):
         if effect_chance == "--":
             effect_chance = 0
         effect_chance = int(effect_chance)
-        if (name == "" and
+        if (move_name == "" and
                 pokemon_type == "" and
                 power == 0 and
                 accuracy == 100 and
@@ -754,7 +682,7 @@ def get_tm_and_hm_attacks_for_forms(dextable):
         else:
             attack = (
                 Move(
-                    name=name,
+                    name=move_name,
                     move_type=convert_string_to_pokemon_type(pokemon_type),
                     category=convert_to_attack_category(category),
                     power=power,
@@ -810,6 +738,78 @@ __first_row_text_of_skippable_table__ = [
     'Base/Max Pokéthlon Stats - Ice',
     'Base/Max Pokéthlon Stats - Ghost',
     'Base/Max Pokéthlon Stats - Dragon',
+
+    'Base/Max Pokķathlon Stats',
+    'Base/Max Pokķathlon Stats - (A-Z)',
+    'Base/Max Pokķathlon Stats - Normal Forme',
+    'Base/Max Pokķathlon Stats - Attack Forme',
+    'Base/Max Pokķathlon Stats - Defense Forme',
+    'Base/Max Pokķathlon Stats - Speed Forme',
+    'Base/Max Pokķathlon Stats - Plant Cloak',
+    'Base/Max Pokķathlon Stats - Sandy Cloak',
+    'Base/Max Pokķathlon Stats - Trash Cloak',
+    'Base/Max Pokķathlon Stats - Altered Forme',
+    'Base/Max Pokķathlon Stats - Origin Forme',
+    'Base/Max Pokķathlon Stats - Land Forme',
+    'Base/Max Pokķathlon Stats - Sky Forme',
+    'Base/Max Pokķathlon Stats - Normal, Fire, Ground, Rock',
+    'Base/Max Pokķathlon Stats - Water, Electric, Psychic',
+    'Base/Max Pokķathlon Stats - Poison, Steel',
+    'Base/Max Pokķathlon Stats - Fighting, Dark',
+    'Base/Max Pokķathlon Stats - Flying, Bug',
+    'Base/Max Pokķathlon Stats - Grass',
+    'Base/Max Pokķathlon Stats - Ice',
+    'Base/Max Pokķathlon Stats - Ghost',
+    'Base/Max Pokķathlon Stats - Dragon',
+
+    'Base/Max Pokťathlon Stats',
+    'Base/Max Pokťathlon Stats - (A-Z)',
+    'Base/Max Pokťathlon Stats - Normal Forme',
+    'Base/Max Pokťathlon Stats - Attack Forme',
+    'Base/Max Pokťathlon Stats - Defense Forme',
+    'Base/Max Pokťathlon Stats - Speed Forme',
+    'Base/Max Pokťathlon Stats - Plant Cloak',
+    'Base/Max Pokťathlon Stats - Sandy Cloak',
+    'Base/Max Pokťathlon Stats - Trash Cloak',
+    'Base/Max Pokťathlon Stats - Altered Forme',
+    'Base/Max Pokťathlon Stats - Origin Forme',
+    'Base/Max Pokťathlon Stats - Land Forme',
+    'Base/Max Pokťathlon Stats - Sky Forme',
+    'Base/Max Pokťathlon Stats - Normal, Fire, Ground, Rock',
+    'Base/Max Pokťathlon Stats - Water, Electric, Psychic',
+    'Base/Max Pokťathlon Stats - Poison, Steel',
+    'Base/Max Pokťathlon Stats - Fighting, Dark',
+    'Base/Max Pokťathlon Stats - Flying, Bug',
+    'Base/Max Pokťathlon Stats - Grass',
+    'Base/Max Pokťathlon Stats - Ice',
+    'Base/Max Pokťathlon Stats - Ghost',
+    'Base/Max Pokťathlon Stats - Dragon',
+
+    'Base/Max Pokťthlon Stats - (A-Z)'
+    
+    'Base/Max Pokťthlon Stats',
+    'Base/Max Pokťthlon Stats - (A-Z)',
+    'Base/Max Pokťthlon Stats - Normal Forme',
+    'Base/Max Pokťthlon Stats - Attack Forme',
+    'Base/Max Pokťthlon Stats - Defense Forme',
+    'Base/Max Pokťthlon Stats - Speed Forme',
+    'Base/Max Pokťthlon Stats - Plant Cloak',
+    'Base/Max Pokťthlon Stats - Sandy Cloak',
+    'Base/Max Pokťthlon Stats - Trash Cloak',
+    'Base/Max Pokťthlon Stats - Altered Forme',
+    'Base/Max Pokťthlon Stats - Origin Forme',
+    'Base/Max Pokťthlon Stats - Land Forme',
+    'Base/Max Pokťthlon Stats - Sky Forme',
+    'Base/Max Pokťthlon Stats - Normal, Fire, Ground, Rock',
+    'Base/Max Pokťthlon Stats - Water, Electric, Psychic',
+    'Base/Max Pokťthlon Stats - Poison, Steel',
+    'Base/Max Pokťthlon Stats - Fighting, Dark',
+    'Base/Max Pokťthlon Stats - Flying, Bug',
+    'Base/Max Pokťthlon Stats - Grass',
+    'Base/Max Pokťthlon Stats - Ice',
+    'Base/Max Pokťthlon Stats - Ghost',
+    'Base/Max Pokťthlon Stats - Dragon',
+
 ]
 __first_row_text_for_level_up_moves__: list[str] = [
     'Diamond/Pearl/Platinum/HeartGold/SoulSilver Level Up',
@@ -836,21 +836,21 @@ def __scrape_serebii_for_pokemon_data__():
             html_children = [c for c in html.children]
             assert len(html_children) == 5
             body = html_children[3]
-            assert body.defender_name == "body"
+            assert body.name == "body"
             body_children = [c for c in body.children]
             assert len(body_children) == 12
             wrapper = body_children[5]
-            assert wrapper.defender_name == "div"
+            assert wrapper.name == "div"
             assert wrapper.attrs['id'] == "wrapper"
             wrapper_children = [c for c in wrapper.children]
             assert len(wrapper_children) == 13
             content = wrapper_children[9]
-            assert content.defender_name == "div"
+            assert content.name == "div"
             assert content.attrs['id'] == "content"
             content_children = [c for c in content.children]
             assert len(content_children) == 4
             main = content_children[3]
-            assert main.defender_name == "main"
+            assert main.name == "main"
             main_children = [c for c in main.children]
             assert len(main_children) == 2
             center = main_children[1]
@@ -1013,9 +1013,13 @@ def __scrape_serebii_for_pokemon_data__():
             assert all_stats is not None
             assert level_to_attacks is not None
             pokemon = SerebiiPokemon(
-                pokemon_information=pokemon_information,
-                all_stats=all_stats,
-                form_to_all_stats=form_to_all_stats,
+                name=pokemon_information.name,
+                id=pokemon_information.id,
+                ability=pokemon_information.ability,
+                pounds=pokemon_information.pounds,
+                pokemon_types=pokemon_information.pokemon_types,
+                base_stats=all_stats,
+                form_to_base_stats=form_to_all_stats,
                 pre_evolution_index_to_level_to_moves=
                 pre_evolution_index_to_level_to_moves,
                 level_to_attacks=level_to_attacks,

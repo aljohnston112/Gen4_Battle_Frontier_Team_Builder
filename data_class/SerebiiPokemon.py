@@ -2,13 +2,11 @@ import attr
 from attr import frozen
 
 from Config import LEVEL
-from data_class.AllStats import AllStats
-from data_class.BaseStats import BaseStats, get_base_stat
 from data_class.Move import Move
-from data_class.PokemonInformation import PokemonInformation
+from data_class.PokemonType import PokemonType
 from data_class.Stat import StatEnum, calculate_health_stat, \
     calculate_non_health_stat
-from data_class.Stats import Stats
+from data_class.Stats import Stats, get_stat
 
 LevelToAttacks = dict[int, list[Move]]
 TmOrHmToAttacks = dict[str, Move]
@@ -17,9 +15,15 @@ FormToAttacks = dict[str, list[Move]]
 
 @frozen
 class SerebiiPokemon:
-    pokemon_information: PokemonInformation
-    all_stats: AllStats
+    name: str
+    pokemon_types: list[PokemonType]
+    id: int
+    ability: str
+    pounds: float
+
+    base_stats: Stats
     level_to_attacks: LevelToAttacks
+
     tm_or_hm_to_attack: TmOrHmToAttacks | None = attr.field(default=None)
 
     egg_moves: list[Move] | None = attr.field(default=None)
@@ -31,7 +35,7 @@ class SerebiiPokemon:
         attr.field(default=None)
     special_moves: list[Move] | None = attr.field(default=None)
 
-    form_to_all_stats: dict[str, AllStats] | None = attr.field(default=None)
+    form_to_base_stats: dict[str, Stats] | None = attr.field(default=None)
     form_to_level_up_attacks: dict[str, LevelToAttacks] | None = \
         attr.field(default=None)
     form_to_tm_or_hm_to_attack: dict[str, TmOrHmToAttacks] | None = \
@@ -40,11 +44,10 @@ class SerebiiPokemon:
 
 
 def get_stat_for_serebii_pokemon(
-        base_stats: BaseStats,
+        stats: Stats,
         ev: int,
         stat_enum: StatEnum,
 ) -> int:
-    stats: Stats = base_stats.stats
     if stat_enum == StatEnum.HEALTH:
         stat: int = calculate_health_stat(
             base=stats.health,
@@ -53,7 +56,7 @@ def get_stat_for_serebii_pokemon(
         )
     else:
         stat: int = calculate_non_health_stat(
-            base=get_base_stat(base_stats, stat_enum),
+            base=get_stat(stats, stat_enum),
             iv=0,
             ev=ev,
             nature_multiplier=1.0
